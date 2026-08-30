@@ -12,3 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Todo lo relacionado con Playwright (screenshots, snapshots, logs, artefactos, etc.) debe guardarse en la carpeta `.playwright-mcp/`, nunca en la raíz del proyecto.
 - Los screenshots se guardan en `.playwright-mcp/screenshots/` con la nomenclatura `nombre-de-imagen_año-mes-dia_hora-minuto-segundos.png` (ej. `.playwright-mcp/screenshots/home_2026-08-30_09-39-41.png`).
+
+# Context7 (MCP)
+
+- Usaremos el MCP de context7 para traer la documentación actualizada del framework y de cualquier otra tecnología con el que se trabaje o se consulte.
