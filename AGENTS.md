@@ -8,6 +8,32 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+# Proyecto
+
+- `open-daycare`: app de gestión para una guardería. Toda la UI, specs y commits van en español.
+- Stack: Next.js 16 (App Router en `app/`), TypeScript strict, Tailwind CSS v4 (tema vía `@theme` en `app/globals.css`; no existe ni se crea `tailwind.config`), ESLint 9 con flat config.
+- El código en `app/` aún es el boilerplate de create-next-app; no tomarlo como referencia de estilo.
+
+# Diseño (fuente de verdad de la UI)
+
+- `references/pantallas/*.dc.html`: diseño HTML de cada pantalla del producto (login, feed, niños, perfil-niño, resumen-día, avisos, publicaciones, cuenta familiar, vincular-padre, activar cuenta…). `index.dc.html` lista todas.
+- `references/screenshots/*.png`: capturas de las pantallas clave.
+- Antes de construir una pantalla, leer su `.dc.html`: tipografías (Fredoka/Nunito), paleta cálida y estructura están definidas ahí, no en el código actual.
+
+# Comandos
+
+- `npm run dev` — servidor de desarrollo (http://localhost:3000).
+- `npm run lint` — ESLint (se ejecuta sin argumentos).
+- `npx tsc --noEmit` — typecheck (no hay script dedicado; `npm run build` también valida tipos).
+- `npm run build` / `npm start` — build y servidor de producción.
+- No hay framework de tests configurado todavía.
+
+# Flujo de trabajo (skills: Spec Driven Development)
+
+- Desarrollo spec-driven: para features grandes usar el skill `/spec` antes de escribir código; las specs se guardan en `specs/`. Usaremos esta skill o habilidad /spec para crear las especifícaciones.
+- Implementar una spec aprobada con el skill `/spec-impl` (crea una rama a partir de la spec). Usaremos esta skill o habilidad /spec-impl para hacer las implementaciones.
+- Commits en español, frase corta describiendo el cambio (ver `git log`).
+
 # Playwright (MCP)
 
 - Todo lo relacionado con Playwright (screenshots, snapshots, logs, artefactos, etc.) debe guardarse en la carpeta `.playwright-mcp/`, nunca en la raíz del proyecto.
