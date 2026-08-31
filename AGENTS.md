@@ -42,3 +42,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Context7 (MCP)
 
 - Usaremos el MCP de context7 para traer la documentación actualizada del framework y de cualquier otra tecnología con el que se trabaje o se consulte.
+
+# Reglas de código 
+- Siempre desarrollar aplicando las reglas de código limpio. Nombres de archivos, variables, constantes, propiedades, métodos, funciones, etc. que sean en inglés.
