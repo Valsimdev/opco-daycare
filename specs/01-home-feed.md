@@ -1,6 +1,6 @@
 # SPEC 01 — Home: feed de la guardería
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** ninguna
 > **Fecha:** 2026-08-31
 > **Objetivo:** Implementar la pantalla Feed (`references/pantallas/feed.dc.html`) como home `/` de la app, visualmente idéntica a la plantilla, con datos ficticios y componentes reutilizables, sin autenticación ni base de datos.
@@ -73,13 +73,13 @@ Convención de esta sección: los identificadores de código van en inglés (reg
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] `/` renderiza sin errores de consola: sidebar, encabezado, caja compositora, separador y las 3 publicaciones (LOGRO, ACTIVIDAD con placeholder de foto, ANUNCIO).
-- [ ] En viewport ≥1024px la composición coincide con `feed.dc.html`: sidebar fija de 248px con «Feed» activo, columna max-width 760px, Fredoka en títulos y Nunito en cuerpo, badges y paleta de la plantilla.
-- [ ] En viewport <1024px la sidebar se oculta, aparece el header con hamburguesa y el drawer abre/cierra.
-- [ ] Ningún control navega fuera de `/` (Nueva publicación, Niños, Avisos, Mi cuenta, Editar, foto, comentarios y cerrar sesión son inertes).
-- [ ] No queda rastro del boilerplate de create-next-app en `/`.
-- [ ] Screenshots de verificación (desktop y móvil) guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/` renderiza sin errores de consola: sidebar, encabezado, caja compositora, separador y las 3 publicaciones (LOGRO, ACTIVIDAD con placeholder de foto, ANUNCIO).
+- [x] En viewport ≥1024px la composición coincide con `feed.dc.html`: sidebar fija de 248px con «Feed» activo, columna max-width 760px, Fredoka en títulos y Nunito en cuerpo, badges y paleta de la plantilla.
+- [x] En viewport <1024px la sidebar se oculta, aparece el header con hamburguesa y el drawer abre/cierra.
+- [x] Ningún control navega fuera de `/` (Nueva publicación, Niños, Avisos, Mi cuenta, Editar, foto, comentarios y cerrar sesión son inertes).
+- [x] No queda rastro del boilerplate de create-next-app en `/`.
+- [x] Screenshots de verificación (desktop y móvil) guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
