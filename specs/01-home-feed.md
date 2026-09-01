@@ -1,6 +1,6 @@
 # SPEC 01 — Home: feed de la guardería
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** ninguna
 > **Fecha:** 2026-08-31
 > **Objetivo:** Implementar la pantalla Feed (`references/pantallas/feed.dc.html`) como home `/` de la app, visualmente idéntica a la plantilla, con datos ficticios y componentes reutilizables, sin autenticación ni base de datos.
