@@ -32,6 +32,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Desarrollo spec-driven: para features grandes usar el skill `/spec` antes de escribir código; las specs se guardan en `specs/`. Usaremos esta skill o habilidad /spec para crear las especifícaciones.
 - Implementar una spec aprobada con el skill `/spec-impl` (crea una rama a partir de la spec). Usaremos esta skill o habilidad /spec-impl para hacer las implementaciones.
+- Al terminar una implementación, verificar los criterios de aceptación con el agente `spec-verifier` (`.opencode/agent/spec-verifier.md`): revisa, corrige y marca los checks de la spec usando Playwright, Context7 y visión para comparar screenshots; si todos pasan, cambia su Estado a «Implementado».
 - Commits en español, frase corta describiendo el cambio (ver `git log`).
 
 # Playwright (MCP)
