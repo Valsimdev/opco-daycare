@@ -13,6 +13,7 @@ export function PostCard({ post }: PostCardProps) {
         {post.type === "announcement" ? (
           <Avatar
             variant="indigo"
+            size="lg"
             icon={
               <svg
                 aria-hidden="true"
@@ -30,7 +31,7 @@ export function PostCard({ post }: PostCardProps) {
             }
           />
         ) : (
-          <Avatar variant="sky" initial={post.title.charAt(0)} />
+          <Avatar variant="sky" initial={post.title.charAt(0)} size="lg" />
         )}
         <div className="flex-1">
           <div className="font-display text-[16.5px] font-semibold text-ink-900">{post.title}</div>

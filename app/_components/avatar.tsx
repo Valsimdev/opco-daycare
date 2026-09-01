@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type AvatarVariant = "coral" | "sky" | "indigo";
-type AvatarSize = "sm" | "md";
+type AvatarSize = "sm" | "md" | "lg";
 
 interface AvatarProps {
   initial?: string;
@@ -18,7 +18,8 @@ const variantClasses: Record<AvatarVariant, string> = {
 
 const sizeClasses: Record<AvatarSize, string> = {
   sm: "size-9.5 text-base",
-  md: "size-11 text-[17px]",
+  md: "size-10 text-base",
+  lg: "size-11 text-[17px]",
 };
 
 export function Avatar({ initial, icon, variant = "coral", size = "md" }: AvatarProps) {
