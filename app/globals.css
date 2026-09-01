@@ -48,6 +48,7 @@ body {
   background: var(--color-cream);
   color: var(--color-ink-900);
   font-family: var(--font-nunito), system-ui, sans-serif;
+  line-height: normal;
 }
 
 ::-webkit-scrollbar {
