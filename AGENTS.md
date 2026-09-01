@@ -44,5 +44,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Usaremos el MCP de context7 para traer la documentación actualizada del framework y de cualquier otra tecnología con el que se trabaje o se consulte.
 
-# Reglas de código 
+# Agentes
+
+- `spec-verifier` (`.opencode/agent/spec-verifier.md`): Verifica, corrige y marca los criterios de aceptación de una spec tras su implementación. Usa Bash (lint/tsc), Playwright MCP (navegación, interacción y screenshots), Context7 (recomendaciones de Next.js/Tailwind) y visión para comparar screenshots con las plantillas `.dc.html`. Se activa al pedir verificar los checks de una spec o al terminar `/spec-impl`.
+
+# Reglas de código
+
 - Siempre desarrollar aplicando las reglas de código limpio. Nombres de archivos, variables, constantes, propiedades, métodos, funciones, etc. que sean en inglés.
+
+# Mantenimiento de este archivo
+
+- Actualizar `AGENTS.md` siempre que se haga algo relevante o que implique grandes cambios: nuevos agentes, comandos, herramientas, convenciones, cambios de stack, flujos de trabajo, etc. Es la fuente de verdad del contexto del proyecto.
