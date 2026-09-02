@@ -1,11 +1,12 @@
 import { classroom, profile } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { NavLink } from "./nav-link";
+import Link from "next/link";
 
 export function Sidebar() {
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col border-r border-border bg-surface px-4 py-6">
-      <a className="flex cursor-pointer items-center gap-[11px] px-2 pb-[22px] pt-1">
+      <Link href="/" className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
         <div className="flex size-9.5 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(155deg,var(--color-coral-300),var(--color-coral-400))]">
           <svg
             aria-hidden="true"
@@ -26,9 +27,9 @@ export function Sidebar() {
           <div className="font-display text-[17px] font-semibold leading-none text-ink-900">OpenDayCare</div>
           <div className="mt-0.5 text-[11.5px] text-ink-400">Sala {classroom.name}</div>
         </div>
-      </a>
+      </Link>
 
-      <a className="mb-[18px] flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]">
+      <Link href="/crear-publicacion" className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]">
         <svg
           aria-hidden="true"
           width="17"
@@ -43,7 +44,7 @@ export function Sidebar() {
           <path d="M12 5v14M5 12h14" />
         </svg>
         Nueva publicación
-      </a>
+      </Link>
 
       <nav className="flex flex-1 flex-col gap-1">
         <NavLink
@@ -69,6 +70,7 @@ export function Sidebar() {
           Niños
         </NavLink>
         <NavLink
+          href="/avisos"
           icon={
             <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />
@@ -78,6 +80,7 @@ export function Sidebar() {
           Avisos
         </NavLink>
         <NavLink
+          href="/mi-cuenta"
           icon={
             <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -96,14 +99,15 @@ export function Sidebar() {
             <div className="text-sm font-extrabold text-ink-900">{profile.name}</div>
             <div className="text-xs text-ink-400">{profile.role}</div>
           </div>
-          <a
+          <Link
+            href="/login"
             title="Cerrar sesión"
-            className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-cream text-ink-500"
+            className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-cream text-ink-500"
           >
             <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
             </svg>
-          </a>
+          </Link>
         </div>
       </div>
     </aside>
