@@ -24,7 +24,7 @@ export function AuthField({
         defaultValue={value}
         className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-3.5 text-[15px] text-ink-900 transition-colors placeholder:text-[#B6A99B] ${
           variant === "focus"
-            ? "border-orange-400"
+            ? "border-[#F2A78E]"
             : "border-border-soft"
         }`}
       />

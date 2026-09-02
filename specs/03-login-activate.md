@@ -1,6 +1,6 @@
 # SPEC 03 — Login & Account Activation
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** ninguna
 > **Fecha:** 2026-09-02
 > **Objetivo:** Implementar las pantallas de login (`/auth/login`) y activar cuenta (`/auth/activate`) visualmente idénticas a sus templates `.dc.html`, sin sidebar, con navegación real entre ambas y componentes reutilizables.
@@ -73,20 +73,20 @@ Esta spec no introduce nuevas estructuras de datos. Reutiliza los tokens de dise
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] `/auth/login` renderiza sin errores de consola: panel de branding izquierdo (logo, título, descripción, badge), formulario derecho (título, subtítulo, campos email y contraseña, link "Olvidaste tu contraseña", botón "Iniciar sesión", link a activar cuenta).
-- [ ] La sección "INGRESO COMO" existe en el DOM pero está oculta (`display: none`).
-- [ ] `/auth/activate` renderiza sin errores: logo, título, subtítulo, InviteCard (Mateo · Sala Soles), campo código invitación, email, contraseña, checkbox autorización, botón "Activar mi cuenta", link a login.
-- [ ] Link "Activá tu cuenta" en login navega a `/auth/activate`.
-- [ ] Link "Iniciar sesión" en activate navega a `/auth/login`.
-- [ ] En viewport ≥1024px login muestra layout de dos columnas coincidente con `login.dc.html`.
-- [ ] En viewport ≥1024px activate muestra formulario centrado (max-width 440px) coincidente con `activar-cuenta.dc.html`.
-- [ ] En viewport <768px login oculta panel izquierdo y muestra solo formulario centrado con padding.
-- [ ] En viewport <768px activate mantiene centrado con padding adecuado.
-- [ ] Fredoka en títulos, Nunito en cuerpo de texto.
-- [ ] Paleta idéntica al template (fondos, bordes, degradados coral, badge verde checkbox).
-- [ ] No queda rastro del boilerplate de create-next-app en las rutas `/auth/login` ni `/auth/activate`.
-- [ ] Screenshots de verificación (desktop y móvil para ambas pantallas) guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/auth/login` renderiza sin errores de consola: panel de branding izquierdo (logo, título, descripción, badge), formulario derecho (título, subtítulo, campos email y contraseña, link "Olvidaste tu contraseña", botón "Iniciar sesión", link a activar cuenta).
+- [x] La sección "INGRESO COMO" existe en el DOM pero está oculta (`display: none`).
+- [x] `/auth/activate` renderiza sin errores: logo, título, subtítulo, InviteCard (Mateo · Sala Soles), campo código invitación, email, contraseña, checkbox autorización, botón "Activar mi cuenta", link a login.
+- [x] Link "Activá tu cuenta" en login navega a `/auth/activate`.
+- [x] Link "Iniciar sesión" en activate navega a `/auth/login`.
+- [x] En viewport ≥1024px login muestra layout de dos columnas coincidente con `login.dc.html`.
+- [x] En viewport ≥1024px activate muestra formulario centrado (max-width 440px) coincidente con `activar-cuenta.dc.html`.
+- [x] En viewport <768px login oculta panel izquierdo y muestra solo formulario centrado con padding.
+- [x] En viewport <768px activate mantiene centrado con padding adecuado.
+- [x] Fredoka en títulos, Nunito en cuerpo de texto.
+- [x] Paleta idéntica al template (fondos, bordes, degradados coral, badge verde checkbox).
+- [x] No queda rastro del boilerplate de create-next-app en las rutas `/auth/login` ni `/auth/activate`.
+- [x] Screenshots de verificación (desktop y móvil para ambas pantallas) guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
