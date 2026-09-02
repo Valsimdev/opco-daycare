@@ -1,6 +1,6 @@
 # SPEC 02 — Kids & child profile
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-01
 > **Objetivo:** Implementar las pantallas Niños (`/kids`) y Perfil de Niño (`/kids/[id]`) visualmente idénticas a sus templates `.dc.html`, reutilizando sidebar y layout existentes, con datos ficticios de 8 niños completos y versión responsiva.
@@ -108,18 +108,18 @@ Mateo (id `mateo-fernandez`) es el único con perfil completo en el mock (alergi
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] `/kids` renderiza sin errores de consola: sidebar con "Niños" activo, encabezado "GESTIÓN / Niños", botón "Agregar niño", buscador, sección "SALA SOLES · 8 niños", grilla de 8 `KidCard`s.
-- [ ] Click en cualquier `KidCard` navega a `/kids/{id}` del niño.
-- [ ] `/kids/mateo-fernandez` renderiza sin errores: link "Volver a Niños", avatar grande, nombre, edad, sala, botón "Editar", caja de alergias (si aplica), datos de nacimiento/sala/ingreso, botón "Resumen del día", padres vinculados con estados, "Vincular otro padre".
-- [ ] En viewport ≥1024px la composición de `/kids` coincide con `ninos.dc.html`: sidebar fija, grilla de 2 columnas, max-width 880px.
-- [ ] En viewport ≥1024px la composición de `/kids/[id]` coincide con `perfil-nino.dc.html`: sidebar fija, layout de dos columnas (perfil + padres), max-width 820px.
-- [ ] En viewport <768px `/kids` muestra grilla de 1 columna con sidebar oculta y drawer hamburguesa funcional.
-- [ ] En viewport <768px `/kids/[id]` apila verticalmente (perfil arriba, padres abajo) con sidebar oculta y drawer hamburguesa funcional.
-- [ ] "Volver a Niños" navega a `/kids`.
-- [ ] Los botones "Agregar niño", "Editar", "Resumen del día" y "Vincular otro padre" son visibles pero inertes.
-- [ ] No queda rastro del boilerplate de create-next-app en las rutas `/kids` ni `/kids/[id]`.
-- [ ] Screenshots de verificación (desktop y móvil para ambas pantallas) guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] `/kids` renderiza sin errores de consola: sidebar con "Niños" activo, encabezado "GESTIÓN / Niños", botón "Agregar niño", buscador, sección "SALA SOLES · 8 niños", grilla de 8 `KidCard`s.
+- [x] Click en cualquier `KidCard` navega a `/kids/{id}` del niño.
+- [x] `/kids/mateo-fernandez` renderiza sin errores: link "Volver a Niños", avatar grande, nombre, edad, sala, botón "Editar", caja de alergias (si aplica), datos de nacimiento/sala/ingreso, botón "Resumen del día", padres vinculados con estados, "Vincular otro padre".
+- [x] En viewport ≥1024px la composición de `/kids` coincide con `ninos.dc.html`: sidebar fija, grilla de 2 columnas, max-width 880px.
+- [x] En viewport ≥1024px la composición de `/kids/[id]` coincide con `perfil-nino.dc.html`: sidebar fija, layout de dos columnas (perfil + padres), max-width 820px.
+- [x] En viewport <768px `/kids` muestra grilla de 1 columna con sidebar oculta y drawer hamburguesa funcional.
+- [x] En viewport <768px `/kids/[id]` apila verticalmente (perfil arriba, padres abajo) con sidebar oculta y drawer hamburguesa funcional.
+- [x] "Volver a Niños" navega a `/kids`.
+- [x] Los botones "Agregar niño", "Editar", "Resumen del día" y "Vincular otro padre" son visibles pero inertes.
+- [x] No queda rastro del boilerplate de create-next-app en las rutas `/kids` ni `/kids/[id]`.
+- [x] Screenshots de verificación (desktop y móvil para ambas pantallas) guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
@@ -150,3 +150,23 @@ Mateo (id `mateo-fernandez`) es el único con perfil completo en el mock (alergi
 - Las demás pantallas del índice.
 
 Cada una de esas, si llega, va en su propia spec.
+
+## Verificación
+
+**Fecha:** 2026-09-02
+**Verificado por:** spec-verifier
+
+| # | Criterio | Estado | Evidencia |
+|---|----------|--------|-----------|
+| 1 | `npm run lint` y `npx tsc --noEmit` pasan sin errores | ✅ | Ambos comandos ejecutados sin salida de error. |
+| 2 | `/kids` renderiza sin errores de consola | ✅ | Snapshot confirma: sidebar con "Niños" activo (bg-peach, text-coral-800), encabezado "GESTIÓN / Niños", botón "Agregar niño" disabled, SearchBar, SectionHeader "SALA SOLES · 8 niños", 8 KidCards renderizadas. 0 errores de consola. Screenshot: `kids-desktop_2026-09-02_18-19-47.png`. |
+| 3 | Click en KidCard navega a `/kids/{id}` | ✅ | Click en "Mateo Fernández" → URL cambió a `/kids/mateo-fernandez`. Confirmado por snapshot con link href `/kids/mateo-fernandez`. |
+| 4 | `/kids/mateo-fernandez` renderiza sin errores | ✅ | Snapshot confirma: link "Volver a Niños" (/kids), avatar 84px con "M", nombre "Mateo Fernández" (Fredoka 28px), "3 años · Sala Soles", botón "Editar" disabled, AlertBox "Alergias y notas", InfoRows (nacimiento, sala, ingreso), botón "Resumen del día" disabled, ParentList con Lucía (ACTIVA) y Diego (PENDIENTE), "Vincular otro padre". 0 errores de consola. Screenshot: `kids-profile-desktop_2026-09-02_18-20-27.png`. |
+| 5 | Desktop `/kids` coincide con `ninos.dc.html` | ✅ | Comparación visual: sidebar fija 248px, grid 2 columnas (`md:grid-cols-2`), max-width 880px, espaciado y paleta coinciden con template. |
+| 6 | Desktop `/kids/[id]` coincide con `perfil-nino.dc.html` | ✅ | Comparación visual: sidebar fija 248px, layout dos columnas (`flex-col md:flex-row`), max-width 820px, avatar 84px, AlertBox coral, InfoRows con bordes, ParentList con badges. Coincide con template. |
+| 7 | Mobile `/kids` responsivo | ✅ | Viewport 375px: sidebar oculta (`max-lg:hidden`), header hamburguesa "Abrir menú" visible, grid 1 columna (`grid-cols-1`), 8 KidCards. Drawer funcional: click en hamburguesa abre sidebar con navegación, "Cerrar menú" funciona. Screenshot: `kids-mobile_2026-09-02_18-21-04.png`. |
+| 8 | Mobile `/kids/[id]` responsivo | ✅ | Viewport 375px: sidebar oculta, perfil apilado verticalmente (ProfileHeader + AlertBox + InfoRows arriba, Resumen + ParentList abajo). Drawer hamburguesa funcional. Screenshot: `kids-profile-mobile_2026-09-02_18-21-19.png`. |
+| 9 | "Volver a Niños" navega a `/kids` | ✅ | Click en link → URL cambió de `/kids/mateo-fernandez` a `/kids`. Confirmado por snapshot. |
+| 10 | Botones inertes | ✅ | "Agregar niño" tiene atributo `disabled`. "Editar" tiene atributo `disabled`. "Resumen del día" tiene atributo `disabled`. "Vincular otro padre" es `<button>` sin handler ni href — click no cambia URL ni causa errores. |
+| 11 | Sin boilerplate | ✅ | `app/page.tsx` eliminado. `globals.css` limpio con `@theme`. `layout.tsx` limpio con fuentes Fredoka/Nunito. No hay texto de boilerplate ni dark mode. |
+| 12 | Screenshots guardados | ✅ | 4 screenshots en `.playwright-mcp/screenshots/`: `kids-desktop_2026-09-02_18-19-47.png`, `kids-mobile_2026-09-02_18-21-04.png`, `kids-profile-desktop_2026-09-02_18-20-27.png`, `kids-profile-mobile_2026-09-02_18-21-19.png`. |
