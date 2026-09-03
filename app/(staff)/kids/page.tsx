@@ -1,10 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { kids } from "@/app/_data/mock";
 import { KidCard } from "@/app/_components/kid-card";
 import { SearchBar } from "@/app/_components/search-bar";
 import { SectionHeader } from "@/app/_components/section-header";
+import AddChildModal from "@/app/_components/add-child-modal";
 
 export default function KidsPage() {
   const roomName = kids[0].room;
+  const [showAddModal, setShowAddModal] = useState(false);
 
   return (
     <div className="mx-auto w-full max-w-[880px] px-10 py-9 max-md:px-4 max-md:py-6">
@@ -17,7 +22,7 @@ export default function KidsPage() {
         </div>
         <button
           className="flex items-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]"
-          disabled
+          onClick={() => setShowAddModal(true)}
         >
           <svg
             width="17"
@@ -44,6 +49,8 @@ export default function KidsPage() {
           <KidCard key={kid.id} kid={kid} />
         ))}
       </div>
+
+      <AddChildModal open={showAddModal} onClose={() => setShowAddModal(false)} />
     </div>
   );
 }
