@@ -21,10 +21,24 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     room?: string;
   }>({});
 
+  const resetForm = () => {
+    setFullName("");
+    setBirthDate("");
+    setRoom("");
+    setAllergies("");
+    setMedicalNotes("");
+    setErrors({});
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
   useEffect(() => {
     if (!open) return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     };
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
@@ -32,7 +46,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
     };
-  }, [open, onClose]);
+  }, [open]);
 
   const handleSave = () => {
     const newErrors: typeof errors = {};
@@ -57,18 +71,19 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
+      resetForm();
       onClose();
     }
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
   const handleCancel = () => {
-    onClose();
+    handleClose();
   };
 
   if (!open) return null;
@@ -110,7 +125,12 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
             type="text"
             placeholder="Ej. Martina López"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              setFullName(e.target.value);
+              if (errors.fullName && e.target.value.trim()) {
+                setErrors((prev) => ({ ...prev, fullName: undefined }));
+              }
+            }}
             className={`mb-[18px] w-full rounded-[14px] border bg-[#fff] px-4 py-[13px] text-[15px] text-ink-900 placeholder:text-[#B6A99B] ${
               errors.fullName
                 ? "border-red-500"
@@ -133,7 +153,15 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
                 type="text"
                 placeholder="dd/mm/aaaa"
                 value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
+                onChange={(e) => {
+                  setBirthDate(e.target.value);
+                  if (errors.birthDate) {
+                    const result = validateDate(e.target.value);
+                    if (result.valid) {
+                      setErrors((prev) => ({ ...prev, birthDate: undefined }));
+                    }
+                  }
+                }}
                 className={`w-full rounded-[14px] border bg-[#fff] px-4 py-[13px] text-[15px] text-ink-900 placeholder:text-[#B6A99B] ${
                   errors.birthDate
                     ? "border-red-500"
@@ -153,7 +181,12 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
               <div className="relative">
                 <select
                   value={room}
-                  onChange={(e) => setRoom(e.target.value)}
+                  onChange={(e) => {
+                    setRoom(e.target.value);
+                    if (errors.room && e.target.value) {
+                      setErrors((prev) => ({ ...prev, room: undefined }));
+                    }
+                  }}
                   className={`w-full appearance-none rounded-[14px] border bg-[#fff] px-4 py-[13px] pr-10 text-[15px] text-ink-900 ${
                     !room
                       ? "text-[#B6A99B]"
