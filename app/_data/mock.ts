@@ -98,6 +98,8 @@ export interface Kid {
   parents: Parent[];
 }
 
+export const rooms = ["Soles", "Lunas", "Estrellas"] as const;
+
 export const kids: Kid[] = [
   {
     id: "mateo-fernandez",
