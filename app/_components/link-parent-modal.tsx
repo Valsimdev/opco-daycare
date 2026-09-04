@@ -26,6 +26,16 @@ export default function LinkParentModal({
     relationship?: string;
   }>({});
 
+  const NAME_REGEX = /^[a-zA-ZÀ-ÿñÑ\s]*$/;
+
+  const handleNameChange = (value: string) => {
+    if (!NAME_REGEX.test(value)) return;
+    setName(value);
+    if (errors.name && value.replace(/\s/g, "").length >= 3) {
+      setErrors((prev) => ({ ...prev, name: undefined }));
+    }
+  };
+
   const resetForm = () => {
     setName("");
     setEmail("");
@@ -60,8 +70,10 @@ export default function LinkParentModal({
   const handleSend = () => {
     const newErrors: typeof errors = {};
 
-    if (!name.trim()) {
+    if (!name.trim() || name.replace(/\s/g, "").length < 3) {
       newErrors.name = "El nombre es obligatorio";
+    } else if (!NAME_REGEX.test(name)) {
+      newErrors.name = "El nombre solo puede contener letras";
     }
 
     if (!email.trim()) {
@@ -100,7 +112,7 @@ export default function LinkParentModal({
           </div>
           <button
             type="button"
-            className="flex size-[34px] items-center justify-center rounded-[10px] bg-border-soft text-ink-500 hover:bg-border-strong"
+            className="flex size-[34px] cursor-pointer items-center justify-center rounded-[10px] bg-border-soft text-ink-500 hover:bg-border-strong"
             onClick={handleClose}
           >
             <svg
@@ -150,12 +162,7 @@ export default function LinkParentModal({
             type="text"
             placeholder="Ej. Diego Fernández"
             value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (errors.name && e.target.value.trim()) {
-                setErrors((prev) => ({ ...prev, name: undefined }));
-              }
-            }}
+            onChange={(e) => handleNameChange(e.target.value)}
             className={`mb-[18px] w-full rounded-[14px] border bg-white px-4 py-[13px] text-[15px] text-ink-900 placeholder:text-[#B6A99B] ${
               errors.name ? "border-red-500" : "border-[#EADFD0]"
             }`}
@@ -201,7 +208,7 @@ export default function LinkParentModal({
                 <button
                   key={rel}
                   type="button"
-                  className={`flex-1 rounded-full border-[1.5px] py-[11px] text-[14px] font-extrabold ${
+                  className={`flex-1 cursor-pointer rounded-full border-[1.5px] py-[11px] text-[14px] font-extrabold ${
                     selected
                       ? "border-indigo-deep bg-indigo-light text-indigo-deep"
                       : "border-[#ECE0D0] bg-surface text-ink-700"
@@ -232,7 +239,7 @@ export default function LinkParentModal({
             <div className="mb-2 text-[12px] font-extrabold tracking-[0.7px] text-[#A88526]">
               CÓDIGO DE INVITACIÓN
             </div>
-            <div className="font-display text-[34px] tracking-[7px] text-[#8A7234]">
+            <div className="font-display text-[34px] font-bold tracking-[7px] text-[#8A7234]">
               {INVITATION_CODE}
             </div>
             <div className="mt-1 text-[13px] text-[#A88526]">
@@ -243,7 +250,7 @@ export default function LinkParentModal({
           {/* Submit button */}
           <button
             type="button"
-            className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
             onClick={handleSend}
           >
             <svg
