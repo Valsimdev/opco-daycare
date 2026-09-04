@@ -2,9 +2,10 @@ import type { Parent } from "@/app/_data/mock";
 
 interface ParentListProps {
   parents: Parent[];
+  onLinkParent?: () => void;
 }
 
-export function ParentList({ parents }: ParentListProps) {
+export function ParentList({ parents, onLinkParent }: ParentListProps) {
   return (
     <div className="rounded-[16px] border border-border bg-surface p-[18px]">
       <div className="mb-[14px] text-[12.5px] font-extrabold tracking-[0.8px] text-ink-600">
@@ -38,7 +39,10 @@ export function ParentList({ parents }: ParentListProps) {
           </div>
         ))}
 
-        <button className="flex items-center gap-3 border-none bg-none p-0 pt-2 cursor-pointer text-left">
+        <button
+          className="flex items-center gap-3 border-none bg-none p-0 pt-2 cursor-pointer text-left"
+          onClick={onLinkParent}
+        >
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-border-muted text-ink-300">
             <svg
               width="18"
