@@ -1,6 +1,6 @@
 # SPEC 04 — Add child modal
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-09-03
 > **Objetivo:** Implementar un modal reutilizable y 100% responsivo para agregar niños desde la pantalla `/kids`, con validación visual de campos obligatorios y los campos del template `agregar-nino.dc.html`.
@@ -83,28 +83,28 @@ export const rooms = ["Soles", "Lunas", "Estrellas"] as const;
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] El botón "Agregar niño" en `/kids` ya no tiene `disabled` y abre el modal al hacer click.
-- [ ] El modal renderiza con los 5 campos: Nombre completo, Fecha de nacimiento, Sala (select), Alergias, Notas médicas.
-- [ ] Los labels coinciden con el template (NOMBRE COMPLETO, FECHA DE NACIMIENTO, SALA, ALERGIAS (ETIQUETAS), NOTAS MÉDICAS).
-- [ ] Los inputs y select tienen el estilo del template (bordes redondeados 14px, fondo blanco, borde `#EADFD0`, padding 13px 16px).
-- [ ] El header del modal tiene "Cancelar" (gris), "Agregar niño" (Fredoka 600), "Guardar" (coral).
-- [ ] Click en "Cancelar" cierra el modal.
-- [ ] Click fuera del modal (overlay) cierra el modal.
-- [ ] Tecla Escape cierra el modal.
-- [ ] Guardar con Nombre vacío muestra "El nombre es obligatorio" en rojo.
-- [ ] Guardar con Fecha vacía muestra "La fecha de nacimiento es obligatoria" en rojo.
-- [ ] Guardar con fecha en formato inválido (ej. "1-2-2025", "abc") muestra "Formato inválido. Usá dd/mm/aaaa" en rojo.
-- [ ] Guardar con fecha que no existe (ej. "31/02/2025", "29/02/2023") muestra "La fecha no es válida" en rojo.
-- [ ] Guardar con Sala no seleccionada muestra "La sala es obligatoria" en rojo.
-- [ ] Guardar con todos los campos obligatorios válidos cierra el modal sin toast ni mensajes.
-- [ ] El campo Sala es un `<select>` con opciones: Soles, Lunas, Estrellas.
-- [ ] En viewport ≥640px el modal es una tarjeta centrada (max-width 520px, border-radius 24px).
-- [ ] En viewport <640px el modal ocupa casi todo el ancho con padding y border-radius 16px.
-- [ ] Fredoka en título del modal, Nunito en labels y campos.
-- [ ] Paleta idéntica al template (`#FBF4EC`, `#ECE0D0`, `#EADFD0`, coral, gris).
-- [ ] `AddChildModal` es reutilizable y exportado desde `app/_components/`.
-- [ ] Screenshots guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El botón "Agregar niño" en `/kids` ya no tiene `disabled` y abre el modal al hacer click.
+- [x] El modal renderiza con los 5 campos: Nombre completo, Fecha de nacimiento, Sala (select), Alergias, Notas médicas.
+- [x] Los labels coinciden con el template (NOMBRE COMPLETO, FECHA DE NACIMIENTO, SALA, ALERGIAS (ETIQUETAS), NOTAS MÉDICAS).
+- [x] Los inputs y select tienen el estilo del template (bordes redondeados 14px, fondo blanco, borde `#EADFD0`, padding 13px 16px).
+- [x] El header del modal tiene "Cancelar" (gris), "Agregar niño" (Fredoka 600), "Guardar" (coral).
+- [x] Click en "Cancelar" cierra el modal.
+- [x] Click fuera del modal (overlay) cierra el modal.
+- [x] Tecla Escape cierra el modal.
+- [x] Guardar con Nombre vacío muestra "El nombre es obligatorio" en rojo.
+- [x] Guardar con Fecha vacía muestra "La fecha de nacimiento es obligatoria" en rojo.
+- [x] Guardar con fecha en formato inválido (ej. "1-2-2025", "abc") muestra "Formato inválido. Usá dd/mm/aaaa" en rojo.
+- [x] Guardar con fecha que no existe (ej. "31/02/2025", "29/02/2023") muestra "La fecha no es válida" en rojo.
+- [x] Guardar con Sala no seleccionada muestra "La sala es obligatoria" en rojo.
+- [x] Guardar con todos los campos obligatorios válidos cierra el modal sin toast ni mensajes.
+- [x] El campo Sala es un `<select>` con opciones: Soles, Lunas, Estrellas.
+- [x] En viewport ≥640px el modal es una tarjeta centrada (max-width 520px, border-radius 24px).
+- [x] En viewport <640px el modal ocupa casi todo el ancho con padding y border-radius 16px.
+- [x] Fredoka en título del modal, Nunito en labels y campos.
+- [x] Paleta idéntica al template (`#FBF4EC`, `#ECE0D0`, `#EADFD0`, coral, gris).
+- [x] `AddChildModal` es reutilizable y exportado desde `app/_components/`.
+- [x] Screenshots guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
