@@ -37,7 +37,7 @@ export function Sidebar() {
       <button
         type="button"
         onClick={() => setShowCreatePostModal(true)}
-        className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
+        className="mb-[18px] cursor-pointer flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
       >
         <svg
           aria-hidden="true"
