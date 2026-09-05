@@ -1,6 +1,6 @@
 # SPEC 05 — Link parent modal
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-09-04
 > **Objetivo:** Implementar un modal reutilizable e independiente para vincular un padre/madre desde el perfil de un niño (`/kids/[id]`), fiel al template `vincular-padre.dc.html`, con validación de campos obligatorios y 100% responsivo.
@@ -72,18 +72,18 @@ Código de invitación ficticio hardcodeado: `"7K4P9"`.
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] "Vincular otro padre" abre el modal.
-- [ ] Modal muestra header, info box, nombre, email, parentesco, código, botón enviar.
-- [ ] Header muestra nombre del niño correctamente interpolado.
-- [ ] Botón X, click overlay, Escape cierran el modal.
-- [ ] Validación: nombre vacío, email vacío, email inválido, parentesco no seleccionado.
-- [ ] Email válido (ej. "correo@ejemplo.com") no muestra error.
-- [ ] Todos válidos → cierra modal sin toast.
-- [ ] Parentesco seleccionado cambia estilo a azul.
-- [ ] Responsivo: desktop 480px centrado, móvil ~100% con padding.
-- [ ] Componente independiente (no comparte código con `AddChildModal`).
-- [ ] Screenshots guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] "Vincular otro padre" abre el modal.
+- [x] Modal muestra header, info box, nombre, email, parentesco, código, botón enviar.
+- [x] Header muestra nombre del niño correctamente interpolado.
+- [x] Botón X, click overlay, Escape cierran el modal.
+- [x] Validación: nombre vacío, email vacío, email inválido, parentesco no seleccionado.
+- [x] Email válido (ej. "correo@ejemplo.com") no muestra error.
+- [x] Todos válidos → cierra modal sin toast.
+- [x] Parentesco seleccionado cambia estilo a azul.
+- [x] Responsivo: desktop 480px centrado, móvil ~100% con padding.
+- [x] Componente independiente (no comparte código con `AddChildModal`).
+- [x] Screenshots guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
