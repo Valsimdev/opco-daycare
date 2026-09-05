@@ -21,7 +21,8 @@ export interface CreatePostModalProps {
 export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
+  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,6 +30,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      setSelectedChildren([]);
+      setIsAllSelected(false);
+      setSelectedType(null);
     }
     return () => {
       document.body.style.overflow = "";
@@ -56,8 +60,24 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     }
   };
 
-  const handleRecipientClick = (recipientId: string) => {
-    setSelectedRecipient((prev) => (prev === recipientId ? null : recipientId));
+  const handleChildToggle = (childId: string) => {
+    if (isAllSelected) {
+      setIsAllSelected(false);
+      setSelectedChildren([childId]);
+      return;
+    }
+    setSelectedChildren((prev) =>
+      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId],
+    );
+  };
+
+  const handleAllToggle = () => {
+    if (selectedChildren.length > 0) {
+      setSelectedChildren([]);
+      setIsAllSelected(true);
+    } else {
+      setIsAllSelected(false);
+    }
   };
 
   return (
@@ -99,12 +119,12 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
             {kids.map((child) => {
-              const isSelected = selectedRecipient === child.id;
+              const isSelected = selectedChildren.includes(child.id);
               return (
                 <button
                   key={child.id}
                   type="button"
-                  onClick={() => handleRecipientClick(child.id)}
+                  onClick={() => handleChildToggle(child.id)}
                   className={`flex cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-[14px] font-bold transition-all ${
                     isSelected
                       ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
@@ -127,9 +147,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             })}
             <button
               type="button"
-              onClick={() => handleRecipientClick("toda-la-sala")}
+              onClick={handleAllToggle}
               className={`cursor-pointer rounded-full px-4 py-1.5 text-[14px] font-bold transition-all ${
-                selectedRecipient === "toda-la-sala"
+                isAllSelected
                   ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
                   : "border-[1.5px] border-border bg-[#FFFDF9] text-ink-700"
               }`}
