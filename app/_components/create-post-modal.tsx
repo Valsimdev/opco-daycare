@@ -30,6 +30,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
+      setSelectedChildren([]);
+      setIsAllSelected(false);
+      setSelectedType(null);
     }
     return () => {
       document.body.style.overflow = "";
