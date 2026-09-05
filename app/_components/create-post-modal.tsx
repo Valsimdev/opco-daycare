@@ -21,7 +21,8 @@ export interface CreatePostModalProps {
 export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedChild, setSelectedChild] = useState<string | null>(null);
+  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,6 +57,26 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     }
   };
 
+  const handleChildToggle = (childId: string) => {
+    if (isAllSelected) {
+      setIsAllSelected(false);
+      setSelectedChildren([childId]);
+      return;
+    }
+    setSelectedChildren((prev) =>
+      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId],
+    );
+  };
+
+  const handleAllToggle = () => {
+    if (selectedChildren.length > 0) {
+      setSelectedChildren([]);
+      setIsAllSelected(true);
+    } else {
+      setIsAllSelected(false);
+    }
+  };
+
   return (
     <div
       ref={overlayRef}
@@ -71,7 +92,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="text-[15px] font-bold text-ink-500 hover:opacity-80"
+            className="cursor-pointer text-[15px] font-bold text-ink-500 hover:opacity-80"
           >
             Cancelar
           </button>
@@ -81,7 +102,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="text-[15px] font-extrabold text-coral-800 hover:opacity-80"
+            className="cursor-pointer text-[15px] font-extrabold text-coral-800 hover:opacity-80"
           >
             Publicar
           </button>
@@ -95,13 +116,13 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
             {kids.map((child) => {
-              const isSelected = selectedChild === child.id;
+              const isSelected = selectedChildren.includes(child.id);
               return (
                 <button
                   key={child.id}
                   type="button"
-                  onClick={() => setSelectedChild(child.id)}
-                  className={`flex items-center gap-2 rounded-full px-2 py-1.5 text-[14px] font-bold transition-all ${
+                  onClick={() => handleChildToggle(child.id)}
+                  className={`flex cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-[14px] font-bold transition-all ${
                     isSelected
                       ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
                       : "border-[1.5px] border-border bg-[#FFFDF9] text-ink-700"
@@ -123,9 +144,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             })}
             <button
               type="button"
-              onClick={() => setSelectedChild("all")}
-              className={`rounded-full px-4 py-1.5 text-[14px] font-bold transition-all ${
-                selectedChild === "all"
+              onClick={handleAllToggle}
+              className={`cursor-pointer rounded-full px-4 py-1.5 text-[14px] font-bold transition-all ${
+                isAllSelected
                   ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
                   : "border-[1.5px] border-border bg-[#FFFDF9] text-ink-700"
               }`}
@@ -146,7 +167,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                   key={type.label}
                   type="button"
                   onClick={() => setSelectedType(type.label)}
-                  className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-all ${
+                  className={`cursor-pointer rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-all ${
                     isSelected ? "ring-2 ring-ink-900 ring-offset-1" : ""
                   }`}
                   style={{
