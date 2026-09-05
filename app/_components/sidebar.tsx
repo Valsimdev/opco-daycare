@@ -1,9 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import { classroom, profile } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { NavLink } from "./nav-link";
 import Link from "next/link";
+import { CreatePostModal } from "./create-post-modal";
 
 export function Sidebar() {
+  const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col border-r border-border bg-surface px-4 py-6">
       <Link href="/" className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
@@ -29,7 +34,11 @@ export function Sidebar() {
         </div>
       </Link>
 
-      <Link href="/crear-publicacion" className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]">
+      <button
+        type="button"
+        onClick={() => setShowCreatePostModal(true)}
+        className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-[linear-gradient(180deg,var(--color-coral-500),var(--color-coral-600))] p-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
+      >
         <svg
           aria-hidden="true"
           width="17"
@@ -44,7 +53,8 @@ export function Sidebar() {
           <path d="M12 5v14M5 12h14" />
         </svg>
         Nueva publicación
-      </Link>
+      </button>
+      <CreatePostModal open={showCreatePostModal} onClose={() => setShowCreatePostModal(false)} />
 
       <nav className="flex flex-1 flex-col gap-1">
         <NavLink
