@@ -1,6 +1,6 @@
 # SPEC 06 — Create post modal
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-04
 > **Objetivo:** Implementar un modal reutilizable y 100% responsivo para crear publicaciones desde el sidebar, fiel al template `crear-publicacion.dc.html`, con estados interactivos y cierre por múltiples vías.
@@ -98,27 +98,27 @@ const postTypes = [
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] El botón "+ Nueva publicación" en el sidebar abre el modal al hacer click.
-- [ ] El modal renderiza las 4 secciones: Para, Tipo, Descripción, Fotos.
-- [ ] Labels coinciden con el template: PARA, TIPO, DESCRIPCIÓN, FOTOS.
-- [ ] Header: "Cancelar" (gris `#94887B`), "Nueva publicación" (Fredoka 600 18px), "Publicar" (coral `#D9583C`).
-- [ ] Sección "Para" muestra botones con avatares de niños (del mock) + botón "Toda la sala".
-- [ ] Sección "Tipo" muestra 7 botones: Comida, Siesta, Actividad, Logro, Ánimo, Foto, Anuncio, con colores del template.
-- [ ] Textarea con placeholder "Contá cómo le fue hoy…", min-height 120px.
-- [ ] Fotos: thumbnail placeholder + botón "Agregar".
-- [ ] Click en "Cancelar" cierra el modal.
-- [ ] Click fuera del modal (overlay) cierra el modal.
-- [ ] Tecla Escape cierra el modal.
-- [ ] Click en "Publicar" cierra el modal sin toast ni mensajes.
-- [ ] Selección visual única en "Para" y "Tipo" (estilos de seleccionado vs no seleccionado).
-- [ ] En viewport ≥640px: tarjeta centrada (max-width 580px, border-radius 24px).
-- [ ] En viewport <640px: casi pantalla completa con padding (border-radius 16px).
-- [ ] Fredoka en título, Nunito en labels y campos.
-- [ ] Paleta idéntica al template (`#FBF4EC`, `#ECE0D0`, `#EADFD0`, coral, gris).
-- [ ] `CreatePostModal` es reutilizable y exportado desde `app/_components/`.
-- [ ] Botón "Agregar" en fotos abre file picker nativo.
-- [ ] Screenshots guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El botón "+ Nueva publicación" en el sidebar abre el modal al hacer click.
+- [x] El modal renderiza las 4 secciones: Para, Tipo, Descripción, Fotos.
+- [x] Labels coinciden con el template: PARA, TIPO, DESCRIPCIÓN, FOTOS.
+- [x] Header: "Cancelar" (gris `#94887B`), "Nueva publicación" (Fredoka 600 18px), "Publicar" (coral `#D9583C`).
+- [x] Sección "Para" muestra botones con avatares de niños (del mock) + botón "Toda la sala".
+- [x] Sección "Tipo" muestra 7 botones: Comida, Siesta, Actividad, Logro, Ánimo, Foto, Anuncio, con colores del template.
+- [x] Textarea con placeholder "Contá cómo le fue hoy…", min-height 120px.
+- [x] Fotos: thumbnail placeholder + botón "Agregar".
+- [x] Click en "Cancelar" cierra el modal.
+- [x] Click fuera del modal (overlay) cierra el modal.
+- [x] Tecla Escape cierra el modal.
+- [x] Click en "Publicar" cierra el modal sin toast ni mensajes.
+- [x] Selección visual única en "Para" y "Tipo" (estilos de seleccionado vs no seleccionado).
+- [x] En viewport ≥640px: tarjeta centrada (max-width 580px, border-radius 24px).
+- [x] En viewport <640px: casi pantalla completa con padding (border-radius 16px).
+- [x] Fredoka en título, Nunito en labels y campos.
+- [x] Paleta idéntica al template (`#FBF4EC`, `#ECE0D0`, `#EADFD0`, coral, gris).
+- [x] `CreatePostModal` es reutilizable y exportado desde `app/_components/`.
+- [x] Botón "Agregar" en fotos abre file picker nativo.
+- [x] Screenshots guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
@@ -149,3 +149,10 @@ const postTypes = [
 - Pantallas "Resumen del día" ni demás del índice.
 
 Cada una de esas, si llega, va en su propia spec.
+
+## Verificación (2026-09-05)
+
+- `npm run lint` (0 errores) y `npx tsc --noEmit` sin errores; `npm run build` compila (genera `next-env.d.ts`, necesario para tsc en un clon fresco).
+- 35/35 checks de comportamiento verificados con Playwright (Chromium headless): apertura desde el sidebar, 4 vías de cierre, selección única en Para/Tipo, colores y tipografías por estilos computados, geometría desktop (580px / radio 24px, centrada) y móvil (343px / radio 16px, padding 16px).
+- Correcciones aplicadas durante la verificación: radios responsivos invertidos (móvil 16px / ≥640px 24px), selección única en "Para" (era múltiple y "Toda la sala" no se podía seleccionar desde cero), colores exactos del template (placeholder `#B6A99B`, icono del thumbnail `#CBB89F`, ring-offset `#FBF4EC`) y scroll interno de la tarjeta en todos los viewports.
+- Screenshots en `.playwright-mcp/screenshots/`: `create-post-modal-desktop_…` (1280px), `create-post-modal-seleccion_…` (selecciones activas) y `create-post-modal-movil_…` (375px).

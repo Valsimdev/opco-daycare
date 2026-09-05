@@ -21,8 +21,7 @@ export interface CreatePostModalProps {
 export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
-  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   useEffect(() => {
@@ -57,24 +56,8 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     }
   };
 
-  const handleChildToggle = (childId: string) => {
-    if (isAllSelected) {
-      setIsAllSelected(false);
-      setSelectedChildren([childId]);
-      return;
-    }
-    setSelectedChildren((prev) =>
-      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId],
-    );
-  };
-
-  const handleAllToggle = () => {
-    if (selectedChildren.length > 0) {
-      setSelectedChildren([]);
-      setIsAllSelected(true);
-    } else {
-      setIsAllSelected(false);
-    }
+  const handleRecipientClick = (recipientId: string) => {
+    setSelectedRecipient((prev) => (prev === recipientId ? null : recipientId));
   };
 
   return (
@@ -86,7 +69,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
       aria-modal="true"
       aria-label="Nueva publicación"
     >
-      <div className="w-full max-w-[580px] rounded-[24px] border border-border bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)] sm:rounded-[16px] sm:my-4 sm:max-h-[calc(100vh-2rem)] sm:overflow-y-auto">
+      <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[580px] overflow-y-auto rounded-[16px] border border-border bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)] sm:max-h-[calc(100dvh-3rem)] sm:rounded-[24px]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-5">
           <button
@@ -116,12 +99,12 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
             {kids.map((child) => {
-              const isSelected = selectedChildren.includes(child.id);
+              const isSelected = selectedRecipient === child.id;
               return (
                 <button
                   key={child.id}
                   type="button"
-                  onClick={() => handleChildToggle(child.id)}
+                  onClick={() => handleRecipientClick(child.id)}
                   className={`flex cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-[14px] font-bold transition-all ${
                     isSelected
                       ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
@@ -144,9 +127,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             })}
             <button
               type="button"
-              onClick={handleAllToggle}
+              onClick={() => handleRecipientClick("toda-la-sala")}
               className={`cursor-pointer rounded-full px-4 py-1.5 text-[14px] font-bold transition-all ${
-                isAllSelected
+                selectedRecipient === "toda-la-sala"
                   ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
                   : "border-[1.5px] border-border bg-[#FFFDF9] text-ink-700"
               }`}
@@ -168,7 +151,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                   type="button"
                   onClick={() => setSelectedType(type.label)}
                   className={`cursor-pointer rounded-full px-4 py-2 text-[13.5px] font-extrabold transition-all ${
-                    isSelected ? "ring-2 ring-ink-900 ring-offset-1" : ""
+                    isSelected
+                      ? "ring-2 ring-ink-900 ring-offset-1 ring-offset-[#FBF4EC]"
+                      : ""
                   }`}
                   style={{
                     background: type.color,
@@ -187,7 +172,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </div>
           <textarea
             placeholder="Contá cómo le fue hoy…"
-            className="mb-[22px] min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] leading-[1.5] text-ink-900 placeholder:text-ink-400"
+            className="mb-[22px] min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] leading-[1.5] text-ink-900 placeholder:text-[#B6A99B]"
           />
 
           {/* FOTOS */}
@@ -195,7 +180,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             FOTOS
           </div>
           <div className="flex gap-3">
-            <div className="flex size-[96px] items-center justify-center rounded-[14px] border border-border bg-surface-muted text-ink-300">
+            <div className="flex size-[96px] items-center justify-center rounded-[14px] border border-border bg-surface-muted text-[#CBB89F]">
               <svg
                 width="26"
                 height="26"
