@@ -11,8 +11,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Proyecto
 
 - `open-daycare`: app de gestión para una guardería. Toda la UI, specs y commits van en español.
-- Stack: Next.js 16 (App Router en `app/`), TypeScript strict, Tailwind CSS v4 (tema vía `@theme` en `app/globals.css`; no existe ni se crea `tailwind.config`), ESLint 9 con flat config.
+- Stack: Next.js 16 (App Router en `app/`), TypeScript strict, Tailwind CSS v4 (tema vía `@theme` en `app/globals.css`; no existe ni se crea `tailwind.config`), ESLint 9 con flat config, Supabase (Postgres, Auth, Edge Functions).
 - El código en `app/` aún es el boilerplate de create-next-app; no tomarlo como referencia de estilo.
+- Referencia de BD: `references/DB-Schema/` contiene el schema de la base de datos (tablas, columnas, relaciones). No está implementado aún en la base de datos, solo como referencia.
 
 # Diseño (fuente de verdad de la UI)
 
@@ -43,6 +44,23 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 # Context7 (MCP)
 
 - Usaremos el MCP de context7 para traer la documentación actualizada del framework y de cualquier otra tecnología con el que se trabaje o se consulte.
+
+# Supabase
+
+- Base de datos: Postgres con Row-Level Security (RLS) obligatorio en todas las tablas de schemas expuestos.
+- Auth: gestión de sesiones JWT, claves publicables (preferir `sb_publishable_*` sobre `anon` legacy).
+- Edge Functions: funciones serverless en Deno, ubicadas en `supabase/functions/`.
+- MCP server: usar herramientas Supabase para migraciones, consultas SQL, logs, asesores de seguridad/rendimiento, y despliegue de Edge Functions.
+- Skill `supabase` (`.agents/skills/supabase/SKILL.md`): cargar para cualquier tarea que involucre Supabase (DB, Auth, Edge Functions, RLS, Storage, Realtime, migraciones, debugging, seguridad).
+- Skill `supabase-postgres-best-practices` (`.agents/skills/supabase-postgres-best-practices/SKILL.md`): cargar antes de escribir o modificar cualquier cosa en Postgres (tablas, columnas, índices, triggers, funciones, RLS, queries, migraciones).
+- Reglas clave:
+  - RLS habilitado en toda tabla de schema expuesto (`public` por defecto).
+  - Nunca exponer `service_role` ni secret keys en el cliente.
+  - `auth.role()` está deprecado; usar `TO authenticated` / `TO anon` con predicados de ownership.
+  - Views con `security_invoker = true` (Postgres 15+).
+  - `SECURITY DEFINER` bypass RLS; evitar salvo caso justificado y mantener en schema no expuesto.
+  - Para migraciones: iterar con `execute_sql` (MCP) o `supabase db query` (CLI), generar migración limpia al finalizar.
+- Referencia de BD: `references/DB-Schema/` contiene el schema de la base de datos (tablas, columnas, relaciones). No está implementado aún en la base de datos, solo como referencia.
 
 # Agentes
 
