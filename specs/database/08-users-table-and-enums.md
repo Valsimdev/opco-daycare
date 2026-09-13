@@ -97,20 +97,20 @@ La relación es: un daycare tiene muchos usuarios (1:N), pero un usuario tiene e
 
 ## Criterios de aceptación
 
-- [ ] La migración se aplica sin errores al proyecto Supabase.
-- [ ] Existen los enums `user_role` con valores `staff`, `parent`, `admin`.
-- [ ] Existe el enum `user_status` con valores `pending`, `active`.
-- [ ] La tabla `users` existe con todas las columnas según el schema.
-- [ ] `users.id` es FK → `auth.users(id)` ON DELETE CASCADE.
-- [ ] `users.daycare_id` es FK → `daycares(id)`.
-- [ ] RLS está habilitado en `users`.
-- [ ] Existe política `SELECT TO authenticated` con `auth.uid() = id`.
-- [ ] Existe política `SELECT TO anon` temporal con `USING (true)`.
-- [ ] Existe trigger `AFTER INSERT` en `auth.users` que crea fila en `users`.
-- [ ] Existe un usuario staff con nombre "Nelsy Luna" y email `nelsy@google.com`.
-- [ ] El usuario staff tiene role `staff`, status `active`, vinculado a "Guardería Sala Soles".
-- [ ] `npx tsc --noEmit` pasa sin errores.
-- [ ] `npm run lint` pasa sin errores.
+- [x] La migración se aplica sin errores al proyecto Supabase.
+- [x] Existen los enums `user_role` con valores `staff`, `parent`, `admin`.
+- [x] Existe el enum `user_status` con valores `pending`, `active`.
+- [x] La tabla `users` existe con todas las columnas según el schema.
+- [x] `users.id` es FK → `auth.users(id)` ON DELETE CASCADE.
+- [x] `users.daycare_id` es FK → `daycares(id)`.
+- [x] RLS está habilitado en `users`.
+- [x] Existe política `SELECT TO authenticated` con `auth.uid() = id`.
+- [x] Existe política `SELECT TO anon` temporal con `USING (true)`.
+- [x] Existe trigger `AFTER INSERT` en `auth.users` que crea fila en `users`.
+- [x] Existe un usuario staff con nombre "Nelsy Luna" y email `nelsy@google.com`.
+- [x] El usuario staff tiene role `staff`, status `active`, vinculado a "Guardería Sala Soles".
+- [x] `npx tsc --noEmit` pasa sin errores.
+- [x] `npm run lint` pasa sin errores.
 
 ## Decisiones
 
