@@ -58,13 +58,32 @@ CREATE TRIGGER on_auth_user_created
     FOR EACH ROW
     EXECUTE FUNCTION public.handle_new_user();
 
+-- Revocar acceso público a la función SECURITY DEFINER (advisor de seguridad)
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon;
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
+
 -- Seed del usuario staff de prueba
-INSERT INTO users (id, daycare_id, role, status, full_name, avatar_url)
+-- Primero insertamos en auth.users para que el trigger cree la fila en users
+INSERT INTO auth.users (
+    id,
+    email,
+    email_confirmed_at,
+    raw_user_meta_data,
+    created_at,
+    updated_at,
+    aud
+)
 VALUES (
     gen_random_uuid(),
-    '3892f2b5-3dfc-484c-8bd1-be0a332c0c96',
-    'staff',
-    'active',
-    'Nelsy Luna',
-    NULL
+    'nelsy@google.com',
+    now(),
+    jsonb_build_object(
+        'daycare_id', '3892f2b5-3dfc-484c-8bd1-be0a332c0c96',
+        'role', 'staff',
+        'full_name', 'Nelsy Luna'
+    ),
+    now(),
+    now(),
+    'authenticated'
 );
