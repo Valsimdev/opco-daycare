@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { kids } from "@/app/_data/mock";
 
 const postTypes = [
@@ -30,33 +30,37 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
-      setSelectedChildren([]);
-      setIsAllSelected(false);
-      setSelectedType(null);
     }
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
 
+  const handleClose = useCallback(() => {
+    setSelectedChildren([]);
+    setIsAllSelected(false);
+    setSelectedType(null);
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        handleClose();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
+  }, [open, handleClose]);
 
   if (!open) return null;
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === overlayRef.current) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -94,7 +98,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
         <div className="flex items-center justify-between border-b border-border px-6 py-5">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="cursor-pointer text-[15px] font-bold text-ink-500 hover:opacity-80"
           >
             Cancelar
@@ -104,7 +108,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </span>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="cursor-pointer text-[15px] font-extrabold text-coral-800 hover:opacity-80"
           >
             Publicar
