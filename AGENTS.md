@@ -60,6 +60,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - Views con `security_invoker = true` (Postgres 15+).
   - `SECURITY DEFINER` bypass RLS; evitar salvo caso justificado y mantener en schema no expuesto.
   - Para migraciones: iterar con `execute_sql` (MCP) o `supabase db query` (CLI), generar migración limpia al finalizar.
+  - **Siempre crear un archivo de migración en `supabase/migrations/` por cada manipulación de la base de datos**, sin excepciones. El archivo debe seguir la nomenclatura `YYYYMMDDHHMMSS_slug_descriptivo.sql` y aplicarse con `supabase_apply_migration`. Nunca modificar la BD directamente sin dejar la migración correspondiente en el repositorio.
 - Referencia de BD: `references/DB-Schema/` contiene el schema de la base de datos (tablas, columnas, relaciones). No está implementado aún en la base de datos, solo como referencia.
 
 # Agentes
