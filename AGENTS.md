@@ -62,6 +62,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - `SECURITY DEFINER` bypass RLS; evitar salvo caso justificado y mantener en schema no expuesto.
   - Para migraciones: iterar con `execute_sql` (MCP) o `supabase db query` (CLI), generar migración limpia al finalizar.
   - **Siempre crear un archivo de migración en `supabase/migrations/` por cada manipulación de la base de datos**, sin excepciones. El archivo debe seguir la nomenclatura `YYYYMMDDHHMMSS_slug_descriptivo.sql` y aplicarse con `supabase_apply_migration`. Nunca modificar la BD directamente sin dejar la migración correspondiente en el repositorio.
+  - **Convención de cliente**: usar siempre los paquetes `@supabase/ssr` y `@supabase/supabase-js` para interactuar con la base de datos desde la aplicación. Los helpers están en `utils/supabase/`:
+    - `utils/supabase/server.ts` — `createClient(cookieStore)` para Server Components y Server Actions.
+    - `utils/supabase/client.ts` — `createClient()` para componentes de cliente (`use client`).
+    - `utils/supabase/middleware.ts` — `createClient(request)` para middleware de Next.js.
+  - Nunca instanciar `createClient` de `@supabase/supabase-js` directamente; usar siempre los helpers de `utils/supabase/`.
 - Referencia de BD: `references/DB-Schema/` contiene el schema de la base de datos (tablas, columnas, relaciones). No está implementado aún en la base de datos, solo como referencia.
 
 # Agentes
