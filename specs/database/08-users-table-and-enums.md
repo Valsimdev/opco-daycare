@@ -1,6 +1,6 @@
 # SPEC 08 — Tabla `users` y enums `user_role` / `user_status`
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** SPEC 07
 > **Fecha:** 2026-09-12
 > **Objetivo:** Crear los enums `user_role` y `user_status` y la tabla `users` en Supabase con RLS, trigger de auto-creación desde `auth.users`, y seed de un usuario staff de prueba.
