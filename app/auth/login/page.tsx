@@ -3,16 +3,17 @@
 import { AuthLogo } from "@/app/_components/auth-logo";
 import { AuthField } from "@/app/_components/auth-field";
 import { AuthButton } from "@/app/_components/auth-button";
-import { useFormStatus } from "react-dom";
 import { loginAction } from "@/app/_actions/auth-actions";
 import { useRef, useState } from "react";
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+interface SubmitButtonProps {
+  loading: boolean;
+}
 
+function SubmitButton({ loading }: SubmitButtonProps) {
   return (
-    <AuthButton type="submit" disabled={pending}>
-      {pending ? "Ingresando..." : "Iniciar sesión"}
+    <AuthButton type="submit" disabled={loading}>
+      {loading ? "Ingresando..." : "Iniciar sesión"}
     </AuthButton>
   );
 }
@@ -20,10 +21,32 @@ function SubmitButton() {
 export default function LoginPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  function validateForm(): string | null {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "Ingresá un email válido.";
+    }
+    if (!password || password.length < 6) {
+      return "La contraseña debe tener al menos 6 caracteres.";
+    }
+    return null;
+  }
 
   async function handleSubmit(formData: FormData) {
     setError(null);
+    setValidationError(null);
+    const validationErr = validateForm();
+    if (validationErr) {
+      setValidationError(validationErr);
+      return;
+    }
+    setLoading(true);
     const result = await loginAction(formData);
+    setLoading(false);
     if (result?.error) {
       setError(result.error);
     }
@@ -96,16 +119,20 @@ export default function LoginPage() {
               type="email"
               name="email"
               placeholder="tu@email.com"
+              value={email}
+              onChange={setEmail}
             />
             <AuthField
               label="Contraseña"
               type="password"
               name="password"
               placeholder="••••••••"
+              value={password}
+              onChange={setPassword}
             />
-            {error && (
+            {(validationError || error) && (
               <div className="mb-5 text-[13.5px] text-red-600 font-semibold text-center">
-                {error}
+                {validationError || error}
               </div>
             )}
             <div className="text-right mb-5">
@@ -113,7 +140,7 @@ export default function LoginPage() {
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
-            <SubmitButton />
+            <SubmitButton loading={loading} />
           </form>
 
           <p className="mt-6 text-center text-[14.5px] text-ink-600">

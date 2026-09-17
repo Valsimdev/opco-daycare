@@ -1,6 +1,6 @@
 # SPEC 09 — Login funcional con Supabase Auth y protección de rutas
 
-> **Estado:** Approved
+> **Estado:** Implementado
 > **Depende de:** SPEC 03 (Login & Account Activation), SPEC 08 (Tabla users y enums)
 > **Fecha:** 2026-09-16
 > **Objetivo:** Hacer funcional el login con email/contraseña vía Supabase Auth, proteger todas las rutas de la app con `proxy.ts` global (patrón Next.js 16), y agregar logout.
@@ -119,22 +119,22 @@ Form submit → Server Action → supabase.auth.signInWithPassword(email, passwo
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] El formulario de login acepta email y contraseña, envía y redirige al feed con credenciales válidas.
-- [ ] Credenciales inválidas muestran mensaje de error inline visible ("Email o contraseña incorrectos").
-- [ ] Email vacío o formato inválido muestra error de validación antes de enviar.
-- [ ] Contraseña vacía o menor a 6 caracteres muestra error de validación antes de enviar.
-- [ ] `proxy.ts` existe en la raíz y `utils/supabase/proxy.ts` con la lógica de sesión.
-- [ ] Acceder a `/(staff)` sin sesión activa redirige a `/auth/login`.
-- [ ] Acceder a `/auth/login` con sesión activa redirige a `/(staff)`.
-- [ ] `/auth/callback` existe y procesa redirects de Supabase Auth.
-- [ ] La Server Action de login verifica que el usuario tiene fila en `users` con `role` válido.
-- [ ] El botón de logout existe en sidebar y mobile-nav.
-- [ ] Click en logout llama a `supabase.auth.signOut()` y redirige a `/auth/login`.
-- [ ] Después de logout, intentar acceder a rutas protegidas redirige a `/auth/login`.
-- [ ] El campo email del login es editable (sin valor hardcodeado).
-- [ ] El botón de login muestra estado de carga durante el submit.
-- [ ] Playwright: screenshots de login exitoso, login fallido, redirección por middleware y logout guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El formulario de login acepta email y contraseña, envía y redirige al feed con credenciales válidas.
+- [x] Credenciales inválidas muestran mensaje de error inline visible ("Email o contraseña incorrectos").
+- [x] Email vacío o formato inválido muestra error de validación antes de enviar.
+- [x] Contraseña vacía o menor a 6 caracteres muestra error de validación antes de enviar.
+- [x] `proxy.ts` existe en la raíz y `utils/supabase/proxy.ts` con la lógica de sesión.
+- [x] Acceder a `/(staff)` sin sesión activa redirige a `/auth/login`.
+- [x] Acceder a `/auth/login` con sesión activa redirige a `/(staff)`.
+- [x] `/auth/callback` existe y procesa redirects de Supabase Auth.
+- [x] La Server Action de login verifica que el usuario tiene fila en `users` con `role` válido.
+- [x] El botón de logout existe en sidebar y mobile-nav.
+- [x] Click en logout llama a `supabase.auth.signOut()` y redirige a `/auth/login`.
+- [x] Después de logout, intentar acceder a rutas protegidas redirige a `/auth/login`.
+- [x] El campo email del login es editable (sin valor hardcodeado).
+- [x] El botón de login muestra estado de carga durante el submit.
+- [x] Playwright: screenshots de login exitoso, login fallido, redirección por middleware y logout guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
