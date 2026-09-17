@@ -45,3 +45,10 @@ export async function loginAction(formData: FormData) {
 
   redirect("/(staff)");
 }
+
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  await supabase.auth.signOut();
+  redirect("/auth/login");
+}

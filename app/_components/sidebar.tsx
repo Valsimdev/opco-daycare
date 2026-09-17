@@ -4,6 +4,7 @@ import { useState } from "react";
 import { classroom, profile } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { NavLink } from "./nav-link";
+import { logoutAction } from "@/app/_actions/auth-actions";
 import Link from "next/link";
 import { CreatePostModal } from "./create-post-modal";
 
@@ -109,15 +110,17 @@ export function Sidebar() {
             <div className="text-sm font-extrabold text-ink-900">{profile.name}</div>
             <div className="text-xs text-ink-400">{profile.role}</div>
           </div>
-          <Link
-            href="/login"
-            title="Cerrar sesión"
-            className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-cream text-ink-500"
-          >
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
-          </Link>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              title="Cerrar sesión"
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-cream text-ink-500"
+            >
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+            </button>
+          </form>
         </div>
       </div>
     </aside>
