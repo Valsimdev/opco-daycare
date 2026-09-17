@@ -43,7 +43,7 @@ export async function loginAction(formData: FormData) {
     return { error: "Usuario no encontrado en el sistema. Contactá al administrador." };
   }
 
-  redirect("/(staff)");
+  redirect("/");
 }
 
 export async function logoutAction() {

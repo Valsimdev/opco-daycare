@@ -37,15 +37,14 @@ export async function updateSession(request: NextRequest) {
   const pathname = url.pathname;
 
   const isAuthRoute = pathname.startsWith("/auth");
-  const isRoot = pathname === "/";
 
-  if (!session && !isAuthRoute && !isRoot) {
+  if (!session && !isAuthRoute) {
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
   if (session && (pathname === "/auth/login" || pathname === "/auth/activate")) {
-    url.pathname = "/(staff)";
+    url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
