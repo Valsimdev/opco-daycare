@@ -1,22 +1,42 @@
+"use client";
+
 import { AuthLogo } from "@/app/_components/auth-logo";
 import { AuthField } from "@/app/_components/auth-field";
 import { AuthButton } from "@/app/_components/auth-button";
+import { useFormStatus } from "react-dom";
+import { loginAction } from "@/app/_actions/auth-actions";
+import { useRef, useState } from "react";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <AuthButton type="submit" disabled={pending}>
+      {pending ? "Ingresando..." : "Iniciar sesión"}
+    </AuthButton>
+  );
+}
 
 export default function LoginPage() {
+  const formRef = useRef<HTMLFormElement>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(formData: FormData) {
+    setError(null);
+    const result = await loginAction(formData);
+    if (result?.error) {
+      setError(result.error);
+    }
+  }
+
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] bg-[#FBF4EC]">
-      {/* Left branding panel */}
       <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-[#F6A98E] via-coral-400 to-[#EC7E62] p-[56px_60px] text-white">
-        {/* Decorative circles */}
         <div className="absolute size-[420px] rounded-full bg-white/10 -top-[140px] -right-[120px]" />
         <div className="absolute size-[300px] rounded-full bg-white/10 -bottom-[110px] -left-[80px]" />
-
-        {/* Logo */}
         <div className="relative">
           <AuthLogo />
         </div>
-
-        {/* Title and description */}
         <div className="relative">
           <h1 className="font-display text-[42px] font-semibold leading-[1.12] mb-[18px]">
             El día de cada niño,
@@ -27,14 +47,11 @@ export default function LoginPage() {
             Publicá momentos, gestioná las salas y mantené a las familias cerca, desde un solo lugar.
           </p>
         </div>
-
-        {/* Badge */}
         <div className="relative text-[14px] text-white/90">
           🌿 Guardería Sala Soles
         </div>
       </div>
 
-      {/* Right form panel */}
       <div className="flex items-center justify-center p-[40px_20px] lg:p-[40px]">
         <div className="w-full max-w-[392px]">
           <h2 className="font-display text-[30px] font-semibold mb-1.5 text-ink-900">
@@ -44,7 +61,6 @@ export default function LoginPage() {
             Ingresá para ver el día de hoy.
           </p>
 
-          {/* "INGRESO COMO" section — hidden but present */}
           <div style={{ display: "none" }}>
             <div className="mb-2 text-xs font-extrabold tracking-wider text-ink-600 uppercase">
               INGRESO COMO
@@ -74,33 +90,32 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Email */}
-          <AuthField
-            label="Email"
-            type="email"
-            value="caro@opendaycare.com"
-          />
+          <form ref={formRef} action={handleSubmit}>
+            <AuthField
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="tu@email.com"
+            />
+            <AuthField
+              label="Contraseña"
+              type="password"
+              name="password"
+              placeholder="••••••••"
+            />
+            {error && (
+              <div className="mb-5 text-[13.5px] text-red-600 font-semibold text-center">
+                {error}
+              </div>
+            )}
+            <div className="text-right mb-5">
+              <a href="#" className="text-coral-900 text-[13.5px] font-extrabold cursor-pointer">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+            <SubmitButton />
+          </form>
 
-          {/* Password */}
-          <AuthField
-            label="Contraseña"
-            type="password"
-            placeholder="••••••••"
-          />
-
-          {/* Forgot password link */}
-          <div className="text-right mb-5">
-            <a href="#" className="text-coral-900 text-[13.5px] font-extrabold cursor-pointer">
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
-
-          {/* Login button */}
-          <AuthButton>
-            Iniciar sesión
-          </AuthButton>
-
-          {/* Activate account link */}
           <p className="mt-6 text-center text-[14.5px] text-ink-600">
             ¿Te invitó la guardería?{" "}
             <a href="/auth/activate" className="text-coral-900 font-extrabold">

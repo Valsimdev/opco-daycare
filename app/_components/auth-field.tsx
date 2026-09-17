@@ -3,6 +3,7 @@ interface AuthFieldProps {
   type?: string;
   placeholder?: string;
   value?: string;
+  name?: string;
   variant?: "default" | "focus";
 }
 
@@ -11,6 +12,7 @@ export function AuthField({
   type = "text",
   placeholder,
   value,
+  name,
   variant = "default",
 }: AuthFieldProps) {
   return (
@@ -19,6 +21,7 @@ export function AuthField({
         {label}
       </div>
       <input
+        name={name}
         type={type}
         placeholder={placeholder}
         defaultValue={value}
