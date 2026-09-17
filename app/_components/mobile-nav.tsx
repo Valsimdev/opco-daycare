@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { profile } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { Sidebar } from "./sidebar";
 
-export function MobileNav() {
+interface MobileNavProps {
+  userName: string;
+  userInitial: string;
+  userRole: string;
+}
+
+export function MobileNav({ userName, userInitial, userRole }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -34,7 +39,7 @@ export function MobileNav() {
         </button>
         <span className="font-display text-[17px] font-semibold text-ink-900">OpenDayCare</span>
         <div className="ms-auto">
-          <Avatar initial={profile.initial} variant="coral" size="sm" />
+          <Avatar initial={userInitial} variant="coral" size="sm" />
         </div>
       </header>
 
@@ -47,7 +52,7 @@ export function MobileNav() {
             className="absolute inset-0 bg-ink-900/40"
           />
           <div className="absolute left-0 top-0 h-full">
-            <Sidebar />
+            <Sidebar userName={userName} userInitial={userInitial} userRole={userRole} />
           </div>
         </div>
       ) : null}

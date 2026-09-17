@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { classroom, profile } from "@/app/_data/mock";
+import { classroom } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { NavLink } from "./nav-link";
+import { logoutAction } from "@/app/_actions/auth-actions";
 import Link from "next/link";
 import { CreatePostModal } from "./create-post-modal";
 
-export function Sidebar() {
+interface SidebarProps {
+  userName: string;
+  userInitial: string;
+  userRole: string;
+}
+
+export function Sidebar({ userName, userInitial, userRole }: SidebarProps) {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col border-r border-border bg-surface px-4 py-6">
@@ -104,20 +111,22 @@ export function Sidebar() {
 
       <div className="mt-2.5 border-t border-border pt-3.5">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <Avatar initial={profile.initial} variant="coral" size="sm" />
+          <Avatar initial={userInitial} variant="coral" size="sm" />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-extrabold text-ink-900">{profile.name}</div>
-            <div className="text-xs text-ink-400">{profile.role}</div>
+            <div className="text-sm font-extrabold text-ink-900">{userName}</div>
+            <div className="text-xs text-ink-400">{userRole}</div>
           </div>
-          <Link
-            href="/login"
-            title="Cerrar sesión"
-            className="flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-cream text-ink-500"
-          >
-            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
-          </Link>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              title="Cerrar sesión"
+              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] bg-cream text-ink-500"
+            >
+              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+            </button>
+          </form>
         </div>
       </div>
     </aside>
