@@ -1,5 +1,6 @@
-import { kids } from "@/app/_data/mock";
 import Link from "next/link";
+import { getChildById } from "@/app/_actions/child-actions";
+import { mapChildToKid } from "@/app/_lib/db-types";
 import KidProfileClient from "./kid-profile-client";
 
 export default function KidProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -8,9 +9,9 @@ export default function KidProfilePage({ params }: { params: Promise<{ id: strin
 
 async function KidProfileWrapper({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const kid = kids.find((k) => k.id === id);
+  const childRow = await getChildById(id);
 
-  if (!kid) {
+  if (!childRow) {
     return (
       <div className="mx-auto w-full max-w-[820px] px-10 py-9 max-md:px-4 max-md:py-6">
         <Link
@@ -40,6 +41,8 @@ async function KidProfileWrapper({ params }: { params: Promise<{ id: string }> }
       </div>
     );
   }
+
+  const kid = mapChildToKid(childRow);
 
   return <KidProfileClient kid={kid} />;
 }

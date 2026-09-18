@@ -72,7 +72,7 @@ export async function createChild(formData: {
     }
 
     return { success: true };
-  } catch (e) {
+  } catch {
     return { success: false, error: "Error inesperado al crear el niño" };
   }
 }
@@ -144,7 +144,16 @@ export async function getChildren() {
     }));
 }
 
-export async function getChildById(id: string) {
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export async function getChildById(slugOrId: string) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
@@ -162,26 +171,43 @@ export async function getChildById(id: string) {
       status,
       rooms!inner ( name )
     `)
-    .eq("id", id)
-    .single();
+    .eq("status", "active");
 
   if (error || !data) {
     return null;
   }
 
-  const roomArr = data.rooms as { name: string }[] | null;
+  const match = (data as { full_name: string; id: string }[]).find(
+    (r) => slugify(r.full_name) === slugOrId || r.id === slugOrId
+  );
+
+  if (!match) return null;
+
+  const row = match as {
+    id: string;
+    full_name: string;
+    birth_date: string;
+    enrolled_at: string;
+    medical_notes: string | null;
+    allergy_tags: string[] | null;
+    photo_consent: boolean;
+    status: string;
+    rooms: { name: string }[];
+  };
+
+  const roomArr = row.rooms as { name: string }[] | null;
   if (!roomArr || roomArr.length === 0) return null;
   const room = roomArr[0];
 
   return {
-    id: data.id,
-    full_name: data.full_name,
-    birth_date: data.birth_date,
-    enrolled_at: data.enrolled_at,
-    medical_notes: data.medical_notes,
-    allergy_tags: data.allergy_tags,
-    photo_consent: data.photo_consent,
-    status: data.status,
+    id: row.id,
+    full_name: row.full_name,
+    birth_date: row.birth_date,
+    enrolled_at: row.enrolled_at,
+    medical_notes: row.medical_notes,
+    allergy_tags: row.allergy_tags,
+    photo_consent: row.photo_consent,
+    status: row.status as "active" | "archived",
     room_name: room.name,
   };
 }
