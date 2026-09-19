@@ -83,8 +83,10 @@ export default function KidProfileClient({ kid }: KidProfileClientProps) {
 
       <LinkParentModal
         open={showLinkParentModal}
+        childId={kid.childId}
         childName={kid.name}
         onClose={() => setShowLinkParentModal(false)}
+        onSuccess={() => window.location.reload()}
       />
     </div>
   );

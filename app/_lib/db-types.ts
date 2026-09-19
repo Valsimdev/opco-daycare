@@ -105,6 +105,7 @@ export function mapChildToKid(row: ChildWithRoom, parentCount: number = 0, paren
 
   return {
     id: slugify(row.full_name),
+    childId: row.id,
     name: row.full_name,
     age: getAge(row.birth_date),
     room: row.room_name,
