@@ -1,56 +1,67 @@
-"use client";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
+import { mapChildToKid } from "@/app/_lib/db-types";
+import KidsPageClient from "./kids-page-client";
 
-import { useState } from "react";
-import { kids } from "@/app/_data/mock";
-import { KidCard } from "@/app/_components/kid-card";
-import { SearchBar } from "@/app/_components/search-bar";
-import { SectionHeader } from "@/app/_components/section-header";
-import AddChildModal from "@/app/_components/add-child-modal";
+export default async function KidsPage() {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
 
-export default function KidsPage() {
-  const roomName = kids[0].room;
-  const [showAddModal, setShowAddModal] = useState(false);
+  const { data: children } = await supabase
+    .from("children")
+    .select(`
+      id,
+      room_id,
+      full_name,
+      birth_date,
+      enrolled_at,
+      medical_notes,
+      allergy_tags,
+      photo_consent,
+      status,
+      rooms!inner ( name )
+    `)
+    .eq("status", "active")
+    .order("full_name");
+
+  const { data: rooms } = await supabase
+    .from("rooms")
+    .select("id, name")
+    .order("name");
+
+  const typedChildren = (children as unknown as {
+    id: string;
+    room_id: string;
+    full_name: string;
+    birth_date: string;
+    enrolled_at: string;
+    medical_notes: string | null;
+    allergy_tags: string[] | null;
+    photo_consent: boolean;
+    status: "active" | "archived";
+    rooms: { name: string } | null;
+  }[])
+    ?.filter((r) => r.rooms && r.rooms.name)
+    .map((r) => ({
+      id: r.id,
+      full_name: r.full_name,
+      birth_date: r.birth_date,
+      enrolled_at: r.enrolled_at,
+      medical_notes: r.medical_notes,
+      allergy_tags: r.allergy_tags,
+      photo_consent: r.photo_consent,
+      status: r.status,
+      room_name: r.rooms!.name,
+    })) || [];
+
+  const kids = typedChildren.map(mapChildToKid);
+  const roomName = kids.length > 0 ? kids[0].room : "Soles";
 
   return (
-    <div className="mx-auto w-full max-w-[880px] px-10 py-9 max-md:px-4 max-md:py-6">
-      <div className="mb-[22px] flex items-end justify-between gap-4">
-        <div>
-          <div className="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-coral-800">
-            GESTIÓN
-          </div>
-          <h1 className="m-0 font-display text-[30px] font-semibold text-ink-900">Niños</h1>
-        </div>
-        <button
-          className="flex items-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]"
-          onClick={() => setShowAddModal(true)}
-        >
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-          Agregar niño
-        </button>
-      </div>
-
-      <SearchBar />
-
-      <SectionHeader room={roomName} count={kids.length} />
-
-      <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2">
-        {kids.map((kid) => (
-          <KidCard key={kid.id} kid={kid} />
-        ))}
-      </div>
-
-      <AddChildModal open={showAddModal} onClose={() => setShowAddModal(false)} />
-    </div>
+    <KidsPageClient
+      kids={kids}
+      roomName={roomName}
+      rooms={rooms || []}
+    />
   );
 }

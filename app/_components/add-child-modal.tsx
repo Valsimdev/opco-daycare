@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { rooms } from "@/app/_data/mock";
+import { createChild } from "@/app/_actions/child-actions";
 import { validateDate } from "@/app/_lib/validate-date";
 
 interface AddChildModalProps {
   open: boolean;
   onClose: () => void;
+  onChildCreated?: () => void;
+  rooms: { id: string; name: string }[];
 }
 
-export default function AddChildModal({ open, onClose }: AddChildModalProps) {
+export default function AddChildModal({ open, onClose, onChildCreated, rooms }: AddChildModalProps) {
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [room, setRoom] = useState("");
@@ -20,6 +22,8 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     birthDate?: string;
     room?: string;
   }>({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const resetForm = () => {
     setFullName("");
@@ -48,7 +52,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     };
   }, [open]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors: typeof errors = {};
 
     if (!fullName.trim()) {
@@ -69,10 +73,26 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     }
 
     setErrors(newErrors);
+    setSaveError(null);
 
     if (Object.keys(newErrors).length === 0) {
-      resetForm();
-      onClose();
+      setSaving(true);
+      const res = await createChild({
+        fullName,
+        birthDate,
+        room,
+        allergies,
+        medicalNotes,
+      });
+      setSaving(false);
+
+      if (res.success) {
+        resetForm();
+        onChildCreated?.();
+        onClose();
+      } else {
+        setSaveError(res.error || "Error al guardar el niño");
+      }
     }
   };
 
@@ -108,10 +128,11 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
           </span>
           <button
             type="button"
-            className="text-[15px] font-extrabold text-[#D9583C] hover:underline"
+            className="text-[15px] font-extrabold text-[#D9583C] hover:underline disabled:opacity-50"
             onClick={handleSave}
+            disabled={saving}
           >
-            Guardar
+            {saving ? "Guardando…" : "Guardar"}
           </button>
         </div>
 
@@ -201,8 +222,8 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
                     Seleccionar sala
                   </option>
                   {rooms.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
+                    <option key={r.id} value={r.name}>
+                      {r.name}
                     </option>
                   ))}
                 </select>
@@ -249,6 +270,10 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
             rows={3}
             className="w-full resize-none rounded-[14px] border border-[#EADFD0] bg-[#fff] px-4 py-[13px] text-[15px] leading-relaxed text-ink-900 placeholder:text-[#B6A99B]"
           />
+
+          {saveError && (
+            <p className="mt-[14px] text-[13px] text-red-500">{saveError}</p>
+          )}
         </div>
       </div>
     </div>
