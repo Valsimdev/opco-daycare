@@ -75,6 +75,7 @@ export default function KidProfileClient({ kid }: KidProfileClientProps) {
 
           <ParentList
             parents={kid.parents}
+            parentCount={kid.parents.length}
             onLinkParent={() => setShowLinkParentModal(true)}
           />
         </div>
