@@ -39,42 +39,31 @@ export default function LinkParentModal({
   const [invitationCode, setInvitationCode] = useState("");
   const [sending, setSending] = useState(false);
 
-  const loadCode = useCallback(async () => {
-    try {
-      const code = await generateInvitationCode();
-      setInvitationCode(code);
-    } catch {
-      setInvitationCode("----");
-    }
-  }, []);
-
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setName("");
     setEmail("");
     setRelationship("");
     setErrors({});
     setInvitationCode("");
     setSending(false);
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetForm();
     onClose();
-  };
+  }, [resetForm, onClose]);
 
   useEffect(() => {
     if (!open) return;
-    loadCode();
-    const handleKey = (e: KeyboardEvent) => {
+    generateInvitationCode().then(setInvitationCode).catch(() => setInvitationCode("----"));
+    document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") handleClose();
-    };
-    document.addEventListener("keydown", handleKey);
+    });
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
     };
-  }, [open, loadCode]);
+  }, [open, handleClose]);
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {

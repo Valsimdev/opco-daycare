@@ -1,6 +1,6 @@
 # SPEC 11 — Parent invitation flow
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02, SPEC 05, SPEC 08
 > **Fecha:** 2026-09-19
 > **Objetivo:** Convertir el modal "Vincular padre" en un flujo completo con persistencia en DB, generación dinámica de código, envío de invitación por correo vía Resend, y pantalla de activación de cuenta para el padre/tutor.
