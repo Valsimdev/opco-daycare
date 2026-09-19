@@ -128,9 +128,9 @@ export async function getChildren() {
     allergy_tags: string[] | null;
     photo_consent: boolean;
     status: "active" | "archived";
-    rooms: { name: string }[] | null;
+    rooms: { name: string } | null;
   }[])
-    .filter((r) => r.rooms && r.rooms.length > 0)
+    .filter((r) => r.rooms && r.rooms.name)
     .map((r) => ({
       id: r.id,
       full_name: r.full_name,
@@ -140,7 +140,7 @@ export async function getChildren() {
       allergy_tags: r.allergy_tags,
       photo_consent: r.photo_consent,
       status: r.status,
-      room_name: r.rooms![0].name,
+      room_name: r.rooms!.name,
     }));
 }
 
@@ -192,12 +192,11 @@ export async function getChildById(slugOrId: string) {
     allergy_tags: string[] | null;
     photo_consent: boolean;
     status: string;
-    rooms: { name: string }[];
+    rooms: { name: string } | null;
   };
 
-  const roomArr = row.rooms as { name: string }[] | null;
-  if (!roomArr || roomArr.length === 0) return null;
-  const room = roomArr[0];
+  const room = row.rooms;
+  if (!room || !room.name) return null;
 
   return {
     id: row.id,
