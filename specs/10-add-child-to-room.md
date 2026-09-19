@@ -1,6 +1,6 @@
 # SPEC 10 — Agregar niño a sala desde BD
 
-> **Estado:** Aprobada
+> **Estado:** Implementado
 > **Depende de:** SPEC 04 (Add child modal), SPEC 07 (daycares), SPEC 08 (users)
 > **Fecha:** 2026-09-18
 > **Objetivo:** Crear las tablas `rooms` y `children` con RLS, seedear los datos iniciales (daycare, 3 salas, 8 niños), conectar el modal "Agregar niño" a la base de datos para registrar niños reales, y hacer que `/kids` y `/kids/[id]` consuman desde BD (dejando los padres vinculados hardcodeados en el perfil).
@@ -161,18 +161,18 @@ Los 8 niños del mock se insertan con sus datos reales. La sala "Soles" se asign
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] La tabla `rooms` existe con 3 filas: "Soles", "Lunas", "Estrellas".
-- [ ] La tabla `children` existe con 8 filas (los niños del mock).
-- [ ] RLS habilitado en `rooms` y `children`.
-- [ ] Políticas RLS: `SELECT TO authenticated`, `SELECT TO anon`, `INSERT TO authenticated` en `children`.
-- [ ] El modal "Agregar niño" persiste un nuevo registro en `children` al hacer click en "Guardar".
-- [ ] El `<select>` de salas en el modal muestra las salas desde la tabla `rooms`.
-- [ ] `/kids` renderiza la lista de niños desde la tabla `children` (no del mock).
-- [ ] `/kids/[id]` renderiza los datos del niño desde la tabla `children` (nombre, edad, sala, alergias, fechas).
-- [ ] El recuadro "PADRES VINCULADOS" en el perfil sigue hardcodeado (sin cambios de esta spec).
-- [ ] Un niño agregado desde el modal aparece automáticamente en la lista de `/kids`.
-- [ ] El `KidCard` muestra correctamente badges de alergia (MANÍ, LACTOSA) traducidos del array `allergy_tags`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] La tabla `rooms` existe con 3 filas: "Soles", "Lunas", "Estrellas".
+- [x] La tabla `children` existe con 8 filas (los niños del mock).
+- [x] RLS habilitado en `rooms` y `children`.
+- [x] Políticas RLS: `SELECT TO authenticated`, `SELECT TO anon`, `INSERT TO authenticated` en `children`.
+- [x] El modal "Agregar niño" persiste un nuevo registro en `children` al hacer click en "Guardar".
+- [x] El `<select>` de salas en el modal muestra las salas desde la tabla `rooms`.
+- [x] `/kids` renderiza la lista de niños desde la tabla `children` (no del mock).
+- [x] `/kids/[id]` renderiza los datos del niño desde la tabla `children` (nombre, edad, sala, alergias, fechas).
+- [x] El recuadro "PADRES VINCULADOS" en el perfil sigue hardcodeado (sin cambios de esta spec).
+- [x] Un niño agregado desde el modal aparece automáticamente en la lista de `/kids`.
+- [x] El `KidCard` muestra correctamente badges de alergia (MANÍ, LACTOSA) traducidos del array `allergy_tags`.
 
 ## Decisiones
 
