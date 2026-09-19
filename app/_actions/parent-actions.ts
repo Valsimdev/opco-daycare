@@ -137,7 +137,7 @@ export async function linkParentAction(formData: {
       });
     }
 
-    revalidatePath(`/child/${formData.childId}`);
+    revalidatePath(`/kids/${formData.childId}`);
 
     return { success: true };
   } catch {

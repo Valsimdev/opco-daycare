@@ -210,3 +210,72 @@ export async function getChildById(slugOrId: string) {
     room_name: room.name,
   };
 }
+
+export async function getChildParentCount(childId: string): Promise<number> {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { count, error } = await supabase
+    .from("parent_children")
+    .select("*", { count: "exact", head: true })
+    .eq("child_id", childId);
+
+  if (error) {
+    return 0;
+  }
+
+  return count || 0;
+}
+
+export interface ParentInfo {
+  id: string;
+  full_name: string;
+  email: string | null;
+  role: string;
+  status: string;
+}
+
+export async function getChildParents(childId: string): Promise<ParentInfo[]> {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const { data, error } = await supabase
+    .from("parent_children")
+    .select(`
+      id,
+      relationship,
+      users!inner ( full_name, email ),
+      invitations!left ( status )
+    `)
+    .eq("child_id", childId);
+
+  if (error || !data) {
+    return [];
+  }
+
+  const typedData = data as unknown as {
+    id: string;
+    relationship: string;
+    users: { full_name: string; email: string | null };
+    invitations: { status: string }[] | null;
+  }[];
+
+  const RELATIONSHIP_UI: Record<string, string> = {
+    father: "Papá",
+    mother: "Mamá",
+    guardian: "Tutor/a",
+  };
+
+  return typedData.map((row) => {
+    const invitationStatus = row.invitations?.[0]?.status || "accepted";
+    const statusUI = invitationStatus === "pending" ? "invitación enviada" : "activa";
+
+    return {
+      id: row.id,
+      full_name: row.users.full_name,
+      email: row.users.email,
+      role: RELATIONSHIP_UI[row.relationship] || row.relationship,
+      status: statusUI,
+    };
+  });
+}

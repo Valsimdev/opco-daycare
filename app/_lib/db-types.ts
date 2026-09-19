@@ -1,4 +1,4 @@
-import type { Kid, KidBadge } from "@/app/_data/mock";
+import type { Kid, KidBadge, Parent } from "@/app/_data/mock";
 
 export interface ChildRow {
   id: string;
@@ -99,7 +99,7 @@ function getAvatarColor(name: string) {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-export function mapChildToKid(row: ChildWithRoom): Kid {
+export function mapChildToKid(row: ChildWithRoom, parentCount: number = 0, parents: Parent[] = []): Kid {
   const badges = buildBadges(row.allergy_tags);
   const { bg, textColor } = getAvatarColor(row.full_name);
 
@@ -111,11 +111,11 @@ export function mapChildToKid(row: ChildWithRoom): Kid {
     avatarInitial: row.full_name.charAt(0).toUpperCase(),
     avatarBg: bg,
     avatarTextColor: textColor,
-    parentCount: 0,
+    parentCount,
     badges,
     birthDate: formatBirthDateUI(row.birth_date),
     enrollmentDate: formatEnrollmentDateUI(row.enrolled_at),
     allergies: row.medical_notes || undefined,
-    parents: [],
+    parents,
   };
 }
