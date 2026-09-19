@@ -17,9 +17,22 @@ export default function KidsPageClient({
   rooms: { id: string; name: string }[];
 }) {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedKidId, setSelectedKidId] = useState<string | null>(null);
 
   const handleChildCreated = () => {
     window.location.reload();
+  };
+
+  const displayedKids = selectedKidId
+    ? kids.filter((k) => k.id === selectedKidId)
+    : kids;
+
+  const handleSearchResult = (id: string) => {
+    setSelectedKidId(id);
+  };
+
+  const handleClearSearch = () => {
+    setSelectedKidId(null);
   };
 
   return (
@@ -51,12 +64,33 @@ export default function KidsPageClient({
         </button>
       </div>
 
-      <SearchBar />
+      <SearchBar kids={kids} onResultClick={handleSearchResult} />
 
-      <SectionHeader room={roomName} count={kids.length} />
+      {selectedKidId && (
+        <button
+          onClick={handleClearSearch}
+          className="mb-3 flex items-center gap-2 text-[14px] font-bold text-coral-800 hover:underline"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Volver a la lista completa
+        </button>
+      )}
+
+      <SectionHeader room={roomName} count={displayedKids.length} />
 
       <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2">
-        {kids.map((kid) => (
+        {displayedKids.map((kid) => (
           <KidCard key={kid.id} kid={kid} />
         ))}
       </div>
