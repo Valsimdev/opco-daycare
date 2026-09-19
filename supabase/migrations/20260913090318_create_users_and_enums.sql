@@ -65,25 +65,51 @@ REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM authenticated;
 
 -- Seed del usuario staff de prueba
 -- Primero insertamos en auth.users para que el trigger cree la fila en users
+-- instance_id es obligatorio para que GoTrue encuentre al usuario al iniciar sesión,
+-- y los campos token deben ser cadena vacía (no NULL) para que GoTrue pueda escanear la fila
 INSERT INTO auth.users (
     id,
+    instance_id,
     email,
     email_confirmed_at,
+    encrypted_password,
+    confirmation_token,
+    recovery_token,
+    email_change_token_new,
+    email_change,
+    email_change_token_current,
+    phone_change,
+    phone_change_token,
+    reauthentication_token,
+    raw_app_meta_data,
     raw_user_meta_data,
     created_at,
     updated_at,
-    aud
+    aud,
+    role
 )
 VALUES (
     gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000000',
     'nelsy@google.com',
     now(),
+    '', -- sin contraseña: definir al activar la cuenta
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '{"provider":"email","providers":["email"]}'::jsonb,
     jsonb_build_object(
-        'daycare_id', '3892f2b5-3dfc-484c-8bd1-be0a332c0c96',
+        'daycare_id', (SELECT id FROM daycares WHERE name = 'Guardería Sala Soles'),
         'role', 'staff',
         'full_name', 'Nelsy Luna'
     ),
     now(),
     now(),
+    'authenticated',
     'authenticated'
 );
