@@ -114,44 +114,55 @@ export async function linkParentAction(formData: {
       return { success: false, error: insertError.message };
     }
 
-    if (RESEND_API_KEY) {
-      const resend = new Resend(RESEND_API_KEY);
-      const activateUrl = `${APP_URL}/activate?code=${code}`;
+    if (RESEND_API_KEY && RESEND_API_KEY !== "re_xxxxxx") {
+      try {
+        const resend = new Resend(RESEND_API_KEY);
+        const activateUrl = `${APP_URL}/auth/activate?code=${code}`;
 
-      await resend.emails.send({
-        from: "OpenDayCare <onboarding@resend.dev>",
-        to: [formData.email.trim().toLowerCase()],
-        subject: "Te han invitado a OpenDayCare",
-        html: `
-          <div style="font-family: 'Fredoka', 'Nunito', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #FFFDF7; border-radius: 16px;">
-            <h1 style="color: #E1851E; font-size: 24px; margin-bottom: 16px;">¡Bienvenido/a a OpenDayCare!</h1>
-            <p style="color: #333; font-size: 16px; line-height: 1.6;">
-              Has sido invitado/a para ser padre/tutor de <strong>${childData.full_name}</strong> en la guardería.
-            </p>
-            <div style="background: #FDF3E0; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
-              <p style="color: #666; font-size: 14px; margin: 0 0 8px;">Tu código de activación:</p>
-              <p style="color: #E1851E; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0;">${code}</p>
+        const { error: emailError } = await resend.emails.send({
+          from: "OpenDayCare <onboarding@resend.dev>",
+          to: [formData.email.trim().toLowerCase()],
+          subject: "Te han invitado a OpenDayCare",
+          html: `
+            <div style="font-family: 'Fredoka', 'Nunito', sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #FFFDF7; border-radius: 16px;">
+              <h1 style="color: #E1851E; font-size: 24px; margin-bottom: 16px;">¡Bienvenido/a a OpenDayCare!</h1>
+              <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                Has sido invitado/a para ser padre/tutor de <strong>${childData.full_name}</strong> en la guardería.
+              </p>
+              <div style="background: #FDF3E0; border-radius: 12px; padding: 20px; text-align: center; margin: 20px 0;">
+                <p style="color: #666; font-size: 14px; margin: 0 0 8px;">Tu código de activación:</p>
+                <p style="color: #E1851E; font-size: 36px; font-weight: 700; letter-spacing: 8px; margin: 0;">${code}</p>
+              </div>
+              <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                Para activar tu cuenta, haz clic en el siguiente enlace o ingresa el código en la página de activación:
+              </p>
+              <div style="text-align: center; margin: 20px 0;">
+                <a href="${activateUrl}" style="display: inline-block; background: #E1851E; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                  Activar mi cuenta
+                </a>
+              </div>
+              <p style="color: #999; font-size: 14px; margin-top: 24px;">
+                Este código expira en 7 días. Si no esperabas este mensaje, puedes ignorarlo.
+              </p>
             </div>
-            <p style="color: #333; font-size: 16px; line-height: 1.6;">
-              Para activar tu cuenta, haz clic en el siguiente enlace o ingresa el código en la página de activación:
-            </p>
-            <div style="text-align: center; margin: 20px 0;">
-              <a href="${activateUrl}" style="display: inline-block; background: #E1851E; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                Activar mi cuenta
-              </a>
-            </div>
-            <p style="color: #999; font-size: 14px; margin-top: 24px;">
-              Este código expira en 7 días. Si no esperabas este mensaje, puedes ignorarlo.
-            </p>
-          </div>
-        `,
-      });
+          `,
+        });
+
+        if (emailError) {
+          console.error("Resend error:", emailError);
+        }
+      } catch (emailErr) {
+        console.error("Failed to send invitation email:", emailErr);
+      }
+    } else {
+      console.warn("RESEND_API_KEY not configured or invalid. Email not sent. Set a valid key in .env.local");
     }
 
     revalidatePath(`/kids/${formData.childId}`);
 
     return { success: true };
-  } catch {
+  } catch (err) {
+    console.error("Unexpected error in linkParentAction:", err);
     return { success: false, error: "Error inesperado al enviar la invitación." };
   }
 }
