@@ -245,7 +245,7 @@ export async function getChildParents(childId: string): Promise<ParentInfo[]> {
     .select(`
       id,
       relationship,
-      users!inner ( id, full_name, email )
+      users!inner ( id, full_name )
     `)
     .eq("child_id", childId);
 
@@ -277,14 +277,14 @@ export async function getChildParents(childId: string): Promise<ParentInfo[]> {
     const typedParents = parentsData as unknown as {
       id: string;
       relationship: string;
-      users: { id: string; full_name: string; email: string | null };
+      users: { id: string; full_name: string };
     }[];
 
     for (const row of typedParents) {
       parents.push({
         id: row.id,
         full_name: row.users.full_name,
-        email: row.users.email,
+        email: null,
         role: RELATIONSHIP_UI[row.relationship] || row.relationship,
         status: "activa",
       });
