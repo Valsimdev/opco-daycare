@@ -38,6 +38,7 @@ export default function LinkParentModal({
   }>({});
   const [invitationCode, setInvitationCode] = useState("");
   const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const resetForm = useCallback(() => {
     setName("");
@@ -46,6 +47,7 @@ export default function LinkParentModal({
     setErrors({});
     setInvitationCode("");
     setSending(false);
+    setSuccess(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -123,11 +125,14 @@ export default function LinkParentModal({
       return;
     }
 
-    resetForm();
-    onClose();
-    if (onSuccess) {
-      onSuccess();
-    }
+    setSuccess(true);
+    setTimeout(() => {
+      resetForm();
+      onClose();
+      if (onSuccess) {
+        onSuccess();
+      }
+    }, 2000);
   };
 
   if (!open) return null;
@@ -290,27 +295,68 @@ export default function LinkParentModal({
             </p>
           )}
 
+          {/* Success message */}
+          {success && (
+            <div className="mb-4 flex items-center justify-center gap-2 rounded-[14px] bg-green-light p-[14px] text-[15px] font-extrabold text-green-deep">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              ¡Invitación enviada con éxito!
+            </div>
+          )}
+
           {/* Submit button */}
           <button
             type="button"
             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={handleSend}
-            disabled={sending}
+            disabled={sending || success}
           >
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m22 2-7 20-4-9-9-4z" />
-              <path d="M22 2 11 13" />
-            </svg>
-            {sending ? "Enviando..." : "Enviar invitación"}
+            {sending ? (
+              <svg
+                className="h-5 w-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m22 2-7 20-4-9-9-4z" />
+                <path d="M22 2 11 13" />
+              </svg>
+            )}
+            {sending ? "Enviando..." : success ? "¡Enviada!" : "Enviar invitación"}
           </button>
         </div>
       </div>
