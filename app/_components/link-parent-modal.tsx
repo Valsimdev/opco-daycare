@@ -55,7 +55,9 @@ export default function LinkParentModal({
 
   useEffect(() => {
     if (!open) return;
-    generateInvitationCode().then(setInvitationCode).catch(() => setInvitationCode("----"));
+    generateInvitationCode()
+      .then((code) => setInvitationCode(code || "----"))
+      .catch(() => setInvitationCode("----"));
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") handleClose();
     });

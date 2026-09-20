@@ -18,32 +18,39 @@ function generateRandomCode(): string {
   return result;
 }
 
-export async function generateInvitationCode(): Promise<string> {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
+export async function generateInvitationCode(): Promise<string | null> {
+  try {
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
 
-  let code: string;
-  let isUnique = false;
+    let code: string;
+    let isUnique = false;
+    let attempts = 0;
+    const maxAttempts = 10;
 
-  while (!isUnique) {
-    code = generateRandomCode();
-    const { data, error } = await supabase
-      .from("invitations")
-      .select("id")
-      .eq("code", code)
-      .maybeSingle();
+    while (!isUnique && attempts < maxAttempts) {
+      code = generateRandomCode();
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("id")
+        .eq("code", code)
+        .maybeSingle();
 
-    if (error) {
-      throw new Error("Error al verificar código de invitación");
+      if (error) {
+        return null;
+      }
+
+      if (!data) {
+        isUnique = true;
+        return code;
+      }
+      attempts++;
     }
 
-    if (!data) {
-      isUnique = true;
-      return code;
-    }
+    return null;
+  } catch {
+    return null;
   }
-
-  return "";
 }
 
 export async function linkParentAction(formData: {
@@ -73,6 +80,10 @@ export async function linkParentAction(formData: {
     }
 
     const code = await generateInvitationCode();
+    if (!code) {
+      return { success: false, error: "No se pudo generar el código de invitación. Intentá de nuevo." };
+    }
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7);
 
