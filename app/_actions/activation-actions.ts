@@ -18,7 +18,7 @@ export async function validateActivationCode(code: string) {
       relationship,
       status,
       expires_at,
-      children ( full_name, room_id, rooms ( name ) )
+      children ( full_name, room_id, photo_consent, rooms ( name, daycare_id ) )
     `)
     .eq("code", code.toUpperCase())
     .maybeSingle();
@@ -48,11 +48,14 @@ export async function validateActivationCode(code: string) {
   const child = data.children as unknown as {
     full_name: string;
     room_id: string;
-    rooms: { name: string };
+    photo_consent: boolean;
+    rooms: { name: string; daycare_id: string };
   } | null;
 
   const childName = child?.full_name || "";
   const roomName = child?.rooms?.name || "";
+  const daycareId = child?.rooms?.daycare_id || "";
+  const photoConsent = child?.photo_consent ?? true;
 
   return {
     valid: true,
@@ -60,5 +63,7 @@ export async function validateActivationCode(code: string) {
     roomName,
     email: data.email,
     relationship: data.relationship,
+    daycareId,
+    photoConsent,
   };
 }

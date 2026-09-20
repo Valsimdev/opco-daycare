@@ -9,15 +9,19 @@ import { activateAccountAction } from "@/app/_actions/auth-actions";
 interface ActivateFormProps {
   code: string;
   email: string;
+  photoConsent: boolean;
+  daycareId: string;
 }
 
 export function ActivateForm({
   code,
   email,
+  photoConsent: initialPhotoConsent,
+  daycareId,
 }: ActivateFormProps) {
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [photoConsent, setPhotoConsent] = useState(true);
+  const [photoConsent, setPhotoConsent] = useState(initialPhotoConsent);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +40,7 @@ export function ActivateForm({
       email,
       password,
       photoConsent,
+      daycareId,
     });
     setLoading(false);
 

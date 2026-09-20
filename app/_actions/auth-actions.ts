@@ -61,6 +61,7 @@ export async function activateAccountAction(formData: {
   email: string;
   password: string;
   photoConsent: boolean;
+  daycareId: string;
 }) {
   try {
     const { createClient } = await import("@supabase/supabase-js");
@@ -96,34 +97,119 @@ export async function activateAccountAction(formData: {
       return { success: false, error: "Este código expiró. Contactá a la guardería." };
     }
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
-      options: {
-        data: {
-          daycare_id: null,
-          role: "parent",
-          full_name: invitation.full_name,
+    // Check if user already exists (may have been created in a previous attempt)
+    const { data: existingUsers, error: existingError } = await supabase
+      .from("users")
+      .select("id, role")
+      .eq("full_name", invitation.full_name)
+      .limit(1);
+
+    let userId: string;
+    let session: { access_token: string; refresh_token: string } | null = null;
+
+    if (existingUsers && existingUsers.length > 0 && !existingError) {
+      // User already exists, try to login instead
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+      });
+
+      if (loginError) {
+        if (loginError.message?.includes("Invalid login credentials")) {
+          return { success: false, error: "Email o contraseña incorrectos. La cuenta ya existe, verificá tus credenciales." };
+        }
+        return { success: false, error: loginError.message };
+      }
+
+      if (!loginData.session) {
+        return { success: false, error: "No se pudo iniciar sesión. Intentá de nuevo." };
+      }
+
+      userId = loginData.user.id;
+      session = loginData.session;
+    } else {
+      // Create new user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+        options: {
+          data: {
+            daycare_id: formData.daycareId,
+            role: "parent",
+            full_name: invitation.full_name,
+          },
         },
-      },
-    });
+      });
 
-    if (authError) {
-      return { success: false, error: authError.message };
-    }
+      if (authError) {
+        if (authError.message?.includes("already registered")) {
+          return { success: false, error: "Este email ya está registrado. Intentá iniciar sesión en su lugar." };
+        }
+        if (authError.message?.includes("security purposes") || authError.message?.includes("rate limit")) {
+          return { success: false, error: "Demasiados intentos. Esperá unos minutos y volvé a intentar." };
+        }
+        if (authError.message?.includes("confirmation")) {
+          console.error("Email confirmation required. Disable email confirmations in Supabase dashboard: Authentication > Email Templates > Confirm signup");
+          return { success: false, error: "Se requiere confirmación de email. Contactá a la guardería para que deshabilite esta opción en la configuración." };
+        }
+        console.error("SignUp error:", authError);
+        return { success: false, error: authError.message || "No se pudo crear la cuenta. Intentá de nuevo." };
+      }
 
-    if (!authData.user || !authData.session) {
-      return { success: false, error: "No se pudo crear la cuenta. Intentá de nuevo." };
+      if (!authData.user) {
+        return { success: false, error: "No se pudo crear la cuenta. Verificá que el email no esté ya registrado." };
+      }
+
+      // Supabase may require email confirmation - check if session exists
+      if (authData.session) {
+        userId = authData.user.id;
+        session = authData.session;
+      } else {
+        // Email confirmation required - this shouldn't happen if email confirmations are disabled
+        return { success: false, error: "Se requiere confirmación de email. Revisá tu bandeja de entrada o contactá a la guardería." };
+      }
     }
 
     // Set the session for subsequent authenticated calls
-    await supabase.auth.setSession({
-      access_token: authData.session.access_token,
-      refresh_token: authData.session.refresh_token,
-    });
+    if (session) {
+      await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+      });
+    }
+
+    // Wait a moment for the auth trigger to create the user row in public.users
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Verify user row exists in public.users (created by auth trigger)
+    const { data: userRow, error: userRowError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (userRowError || !userRow) {
+      // User row doesn't exist yet - trigger may not be set up
+      // Try to create it manually
+      const { error: insertUserError } = await supabase
+        .from("users")
+        .insert({
+          id: userId,
+          daycare_id: formData.daycareId || null,
+          role: "parent",
+          full_name: invitation.full_name,
+          status: "active",
+        });
+
+      if (insertUserError && insertUserError.code !== "23505") {
+        // 23505 = unique violation, which is fine
+        console.error("Error creating user row:", insertUserError);
+        return { success: false, error: "Error al crear el perfil de usuario. Contactá al administrador." };
+      }
+    }
 
     const { error: parentChildError } = await supabase.from("parent_children").insert({
-      parent_id: authData.user.id,
+      parent_id: userId,
       child_id: invitation.child_id,
       relationship: invitation.relationship,
     });

@@ -126,6 +126,8 @@ export default async function ActivatePage({
         <ActivateForm
           code={code.toUpperCase()}
           email={result.email || ""}
+          photoConsent={result.photoConsent ?? true}
+          daycareId={result.daycareId || ""}
         />
 
         {/* Login link */}
