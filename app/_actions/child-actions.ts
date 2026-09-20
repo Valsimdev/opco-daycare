@@ -239,26 +239,30 @@ export async function getChildParents(childId: string): Promise<ParentInfo[]> {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data, error } = await supabase
+  // Get accepted parents from parent_children
+  const { data: parentsData, error: parentsError } = await supabase
     .from("parent_children")
     .select(`
       id,
       relationship,
-      users!inner ( full_name, email ),
-      invitations!left ( status )
+      users!inner ( id, full_name, email )
     `)
     .eq("child_id", childId);
 
-  if (error || !data) {
-    return [];
+  if (parentsError) {
+    console.error("Error fetching parents:", parentsError);
   }
 
-  const typedData = data as unknown as {
-    id: string;
-    relationship: string;
-    users: { full_name: string; email: string | null };
-    invitations: { status: string }[] | null;
-  }[];
+  // Get pending invitations
+  const { data: invitationsData, error: invitationsError } = await supabase
+    .from("invitations")
+    .select("id, full_name, email, relationship, status")
+    .eq("child_id", childId)
+    .eq("status", "pending");
+
+  if (invitationsError) {
+    console.error("Error fetching invitations:", invitationsError);
+  }
 
   const RELATIONSHIP_UI: Record<string, string> = {
     father: "Papá",
@@ -266,16 +270,47 @@ export async function getChildParents(childId: string): Promise<ParentInfo[]> {
     guardian: "Tutor/a",
   };
 
-  return typedData.map((row) => {
-    const invitationStatus = row.invitations?.[0]?.status || "accepted";
-    const statusUI = invitationStatus === "pending" ? "invitación enviada" : "activa";
+  const parents: ParentInfo[] = [];
 
-    return {
-      id: row.id,
-      full_name: row.users.full_name,
-      email: row.users.email,
-      role: RELATIONSHIP_UI[row.relationship] || row.relationship,
-      status: statusUI,
-    };
-  });
+  // Add accepted parents
+  if (parentsData) {
+    const typedParents = parentsData as unknown as {
+      id: string;
+      relationship: string;
+      users: { id: string; full_name: string; email: string | null };
+    }[];
+
+    for (const row of typedParents) {
+      parents.push({
+        id: row.id,
+        full_name: row.users.full_name,
+        email: row.users.email,
+        role: RELATIONSHIP_UI[row.relationship] || row.relationship,
+        status: "activa",
+      });
+    }
+  }
+
+  // Add pending invitations
+  if (invitationsData) {
+    const typedInvitations = invitationsData as {
+      id: string;
+      full_name: string;
+      email: string;
+      relationship: string;
+      status: string;
+    }[];
+
+    for (const inv of typedInvitations) {
+      parents.push({
+        id: inv.id,
+        full_name: inv.full_name,
+        email: inv.email,
+        role: RELATIONSHIP_UI[inv.relationship] || inv.relationship,
+        status: "invitación enviada",
+      });
+    }
+  }
+
+  return parents;
 }
