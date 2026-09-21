@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getChildById } from "@/app/_actions/child-actions";
+import { getChildById, getChildParentCount, getChildParents } from "@/app/_actions/child-actions";
 import { mapChildToKid } from "@/app/_lib/db-types";
 import KidProfileClient from "./kid-profile-client";
 
@@ -42,7 +42,38 @@ async function KidProfileWrapper({ params }: { params: Promise<{ id: string }> }
     );
   }
 
-  const kid = mapChildToKid(childRow);
+  const parentCount = await getChildParentCount(childRow.id);
+  const parentsDb = await getChildParents(childRow.id);
+
+  const AVATAR_COLORS = [
+    { bg: "#A9D9E8", textColor: "#1F7A93" },
+    { bg: "#F4B8CC", textColor: "#C44A7A" },
+    { bg: "#B9DEC4", textColor: "#3E8B62" },
+    { bg: "#F4DC8E", textColor: "#9A7B1E" },
+    { bg: "#C9B6E8", textColor: "#7B5FC0" },
+  ];
+
+  function getAvatarColor(name: string) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  }
+
+  const parents = parentsDb.map((p) => {
+    const { bg } = getAvatarColor(p.full_name);
+    const avatarInitial = p.full_name.charAt(0).toUpperCase();
+    return {
+      name: p.full_name,
+      role: p.role,
+      status: p.status as "activa" | "invitación enviada",
+      avatarInitial,
+      avatarBg: bg,
+    };
+  });
+
+  const kid = mapChildToKid(childRow, parentCount, parents);
 
   return <KidProfileClient kid={kid} />;
 }

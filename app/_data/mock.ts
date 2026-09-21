@@ -84,6 +84,7 @@ export interface Parent {
 
 export interface Kid {
   id: string;
+  childId: string;
   name: string;
   age: number;
   room: string;
@@ -103,6 +104,7 @@ export const rooms = ["Soles", "Lunas", "Estrellas"] as const;
 export const kids: Kid[] = [
   {
     id: "mateo-fernandez",
+    childId: "00000000-0000-0000-0000-000000000001",
     name: "Mateo Fernández",
     age: 3,
     room: "Soles",
@@ -121,6 +123,7 @@ export const kids: Kid[] = [
   },
   {
     id: "sofia-mendez",
+    childId: "00000000-0000-0000-0000-000000000002",
     name: "Sofía Méndez",
     age: 2,
     room: "Soles",
@@ -137,6 +140,7 @@ export const kids: Kid[] = [
   },
   {
     id: "benjamin-ruiz",
+    childId: "00000000-0000-0000-0000-000000000003",
     name: "Benjamín Ruiz",
     age: 3,
     room: "Soles",
@@ -154,6 +158,7 @@ export const kids: Kid[] = [
   },
   {
     id: "valentina-soto",
+    childId: "00000000-0000-0000-0000-000000000004",
     name: "Valentina Soto",
     age: 2,
     room: "Soles",
@@ -168,6 +173,7 @@ export const kids: Kid[] = [
   },
   {
     id: "tomas-diaz",
+    childId: "00000000-0000-0000-0000-000000000005",
     name: "Tomás Díaz",
     age: 3,
     room: "Soles",
@@ -185,6 +191,7 @@ export const kids: Kid[] = [
   },
   {
     id: "emma-castro",
+    childId: "00000000-0000-0000-0000-000000000006",
     name: "Emma Castro",
     age: 2,
     room: "Soles",
@@ -201,6 +208,7 @@ export const kids: Kid[] = [
   },
   {
     id: "lucas-romero",
+    childId: "00000000-0000-0000-0000-000000000007",
     name: "Lucas Romero",
     age: 3,
     room: "Soles",
@@ -217,6 +225,7 @@ export const kids: Kid[] = [
   },
   {
     id: "olivia-vega",
+    childId: "00000000-0000-0000-0000-000000000008",
     name: "Olivia Vega",
     age: 2,
     room: "Soles",

@@ -2,10 +2,11 @@ import type { Parent } from "@/app/_data/mock";
 
 interface ParentListProps {
   parents: Parent[];
+  parentCount: number;
   onLinkParent?: () => void;
 }
 
-export function ParentList({ parents, onLinkParent }: ParentListProps) {
+export function ParentList({ parents, parentCount, onLinkParent }: ParentListProps) {
   return (
     <div className="rounded-[16px] border border-border bg-surface p-[18px]">
       <div className="mb-[14px] text-[12.5px] font-extrabold tracking-[0.8px] text-ink-600">
@@ -57,7 +58,9 @@ export function ParentList({ parents, onLinkParent }: ParentListProps) {
               <path d="M12 5v14M5 12h14" />
             </svg>
           </span>
-          <span className="text-[14.5px] font-extrabold text-coral-900">Vincular otro padre</span>
+          <span className="text-[14.5px] font-extrabold text-coral-900">
+            {parentCount === 0 ? "Vincular padre/tutor" : "Vincular otro padre"}
+          </span>
         </button>
       </div>
     </div>

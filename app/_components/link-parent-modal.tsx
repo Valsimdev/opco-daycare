@@ -1,21 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { generateInvitationCode, linkParentAction } from "@/app/_actions/parent-actions";
+
+const RELATIONSHIP_MAP: Record<string, "father" | "mother" | "guardian"> = {
+  Mamá: "mother",
+  Papá: "father",
+  "Tutor/a": "guardian",
+};
+const RELATIONSHIPS = ["Mamá", "Papá", "Tutor/a"] as const;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[a-zA-ZÀ-ÿñÑ\s]*$/;
 
 interface LinkParentModalProps {
   open: boolean;
+  childId: string;
   childName: string;
   onClose: () => void;
+  onSuccess?: () => void;
 }
-
-const INVITATION_CODE = "7K4P9";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const RELATIONSHIPS = ["Mamá", "Papá", "Tutor/a"] as const;
 
 export default function LinkParentModal({
   open,
+  childId,
   childName,
   onClose,
+  onSuccess,
 }: LinkParentModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,9 +34,46 @@ export default function LinkParentModal({
     name?: string;
     email?: string;
     relationship?: string;
+    form?: string;
   }>({});
+  const [invitationCode, setInvitationCode] = useState("");
+  const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const NAME_REGEX = /^[a-zA-ZÀ-ÿñÑ\s]*$/;
+  const resetForm = useCallback(() => {
+    setName("");
+    setEmail("");
+    setRelationship("");
+    setErrors({});
+    setInvitationCode("");
+    setSending(false);
+    setSuccess(false);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    resetForm();
+    onClose();
+  }, [resetForm, onClose]);
+
+  useEffect(() => {
+    if (!open) return;
+    generateInvitationCode()
+      .then((code) => setInvitationCode(code || "----"))
+      .catch(() => setInvitationCode("----"));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") handleClose();
+    });
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open, handleClose]);
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
 
   const handleNameChange = (value: string) => {
     if (!NAME_REGEX.test(value)) return;
@@ -36,38 +83,10 @@ export default function LinkParentModal({
     }
   };
 
-  const resetForm = () => {
-    setName("");
-    setEmail("");
-    setRelationship("");
+  const handleSend = async () => {
     setErrors({});
-  };
+    setSending(true);
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-    };
-  }, [open]);
-
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
-  const handleSend = () => {
     const newErrors: typeof errors = {};
 
     if (!name.trim() || name.replace(/\s/g, "").length < 3) {
@@ -86,12 +105,34 @@ export default function LinkParentModal({
       newErrors.relationship = "Seleccioná un parentesco";
     }
 
-    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setSending(false);
+      return;
+    }
 
-    if (Object.keys(newErrors).length === 0) {
+    const result = await linkParentAction({
+      childId,
+      fullName: name,
+      email,
+      relationship: RELATIONSHIP_MAP[relationship],
+    });
+
+    setSending(false);
+
+    if (result.error) {
+      setErrors({ form: result.error });
+      return;
+    }
+
+    setSuccess(true);
+    setTimeout(() => {
       resetForm();
       onClose();
-    }
+      if (onSuccess) {
+        onSuccess();
+      }
+    }, 2000);
   };
 
   if (!open) return null;
@@ -240,33 +281,82 @@ export default function LinkParentModal({
               CÓDIGO DE INVITACIÓN
             </div>
             <div className="font-display text-[34px] font-bold tracking-[7px] text-[#8A7234]">
-              {INVITATION_CODE}
+              {invitationCode || "----"}
             </div>
             <div className="mt-1 text-[13px] text-[#A88526]">
               Vence en 7 días
             </div>
           </div>
 
+          {/* Form error */}
+          {errors.form && (
+            <p className="mb-4 text-center text-[13px] text-red-500">
+              {errors.form}
+            </p>
+          )}
+
+          {/* Success message */}
+          {success && (
+            <div className="mb-4 flex items-center justify-center gap-2 rounded-[14px] bg-green-light p-[14px] text-[15px] font-extrabold text-green-deep">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+              ¡Invitación enviada con éxito!
+            </div>
+          )}
+
           {/* Submit button */}
           <button
             type="button"
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]"
+            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-coral-500 to-coral-600 py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:opacity-60 disabled:cursor-not-allowed"
             onClick={handleSend}
+            disabled={sending || success}
           >
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m22 2-7 20-4-9-9-4z" />
-              <path d="M22 2 11 13" />
-            </svg>
-            Enviar invitación
+            {sending ? (
+              <svg
+                className="h-5 w-5 animate-spin"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+            ) : (
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m22 2-7 20-4-9-9-4z" />
+                <path d="M22 2 11 13" />
+              </svg>
+            )}
+            {sending ? "Enviando..." : success ? "¡Enviada!" : "Enviar invitación"}
           </button>
         </div>
       </div>

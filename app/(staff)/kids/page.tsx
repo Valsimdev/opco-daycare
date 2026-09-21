@@ -54,7 +54,7 @@ export default async function KidsPage() {
       room_name: r.rooms!.name,
     })) || [];
 
-  const kids = typedChildren.map(mapChildToKid);
+  const kids = typedChildren.map((r) => mapChildToKid(r));
   const roomName = kids.length > 0 ? kids[0].room : "Soles";
 
   return (
