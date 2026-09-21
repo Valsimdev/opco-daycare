@@ -130,21 +130,21 @@ Traducción de enums a UI (español):
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] El botón en `ParentList` muestra "Vincular padre/tutor" si el niño tiene 0 padres vinculados.
-- [ ] El botón en `ParentList` muestra "Vincular otro padre" si el niño tiene ≥1 padre vinculado.
-- [ ] El modal "Vincular padre" mantiene su estética actual sin cambios visuales.
-- [ ] El código de invitación es dinámico (5 chars alfanuméricos), no hardcodeado.
-- [ ] Al enviar el formulario del modal se crea un registro en `invitations` con código único.
-- [ ] El registro en `invitations` tiene `expires_at` a 7 días del momento de creación.
-- [ ] Se envía un email con Resend al email capturado con el código y link de activación.
-- [ ] La ruta `/activate` renderiza la pantalla de activación fiel a `activar-cuenta.dc.html`.
-- [ ] `/activate?code=XXXXX` muestra el formulario cuando el código es válido y vigente.
-- [ ] `/activate?code=INVALID` muestra mensaje de error.
-- [ ] Crear contraseña + enviar activa la cuenta: usuario en `auth.users`, fila en `users` con role `parent`, vínculo en `parent_children`, invitación marcada `accepted`.
-- [ ] Tras vincular exitosamente, el perfil del niño muestra al nuevo padre con estado "invitación enviada".
-- [ ] Las tablas `invitations` y `parent_children` tienen RLS habilitado.
-- [ ] Se crearon migraciones SQL para todas las manipulaciones de base de datos.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] El botón en `ParentList` muestra "Vincular padre/tutor" si el niño tiene 0 padres vinculados.
+- [x] El botón en `ParentList` muestra "Vincular otro padre" si el niño tiene ≥1 padre vinculado.
+- [x] El modal "Vincular padre" mantiene su estética actual sin cambios visuales.
+- [x] El código de invitación es dinámico (5 chars alfanuméricos), no hardcodeado.
+- [x] Al enviar el formulario del modal se crea un registro en `invitations` con código único.
+- [x] El registro en `invitations` tiene `expires_at` a 7 días del momento de creación.
+- [x] Se envía un email con Resend al email capturado con el código y link de activación.
+- [x] La ruta `/activate` renderiza la pantalla de activación fiel a `activar-cuenta.dc.html`.
+- [x] `/activate?code=XXXXX` muestra el formulario cuando el código es válido y vigente.
+- [x] `/activate?code=INVALID` muestra mensaje de error.
+- [x] Crear contraseña + enviar activa la cuenta: usuario en `auth.users`, fila en `users` con role `parent`, vínculo en `parent_children`, invitación marcada `accepted`.
+- [x] Tras vincular exitosamente, el perfil del niño muestra al nuevo padre con estado "invitación enviada".
+- [x] Las tablas `invitations` y `parent_children` tienen RLS habilitado.
+- [x] Se crearon migraciones SQL para todas las manipulaciones de base de datos.
 
 ## Decisiones
 
