@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;
@@ -41,6 +42,10 @@ export async function loginAction(formData: FormData) {
   if (userError || !userRow) {
     await supabase.auth.signOut();
     return { error: "Usuario no encontrado en el sistema. Contactá al administrador." };
+  }
+
+  if (userRow.role === "parent") {
+    redirect("/family");
   }
 
   redirect("/");
@@ -237,8 +242,11 @@ export async function activateAccountAction(formData: {
         .eq("id", invitation.child_id);
     }
 
-    return { success: true };
-  } catch {
+    redirect("/auth/login?activated=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     return { success: false, error: "Error inesperado al activar la cuenta." };
   }
 }
