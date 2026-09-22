@@ -43,6 +43,10 @@ export async function loginAction(formData: FormData) {
     return { error: "Usuario no encontrado en el sistema. Contactá al administrador." };
   }
 
+  if (userRow.role === "parent") {
+    redirect("/family");
+  }
+
   redirect("/");
 }
 
