@@ -253,7 +253,7 @@ export async function getChildParents(childId: string): Promise<ParentInfo[]> {
     console.error("Error fetching parents:", parentsError);
   }
 
-  // Get pending invitations
+  // Get pending invitations (parents who haven't activated yet)
   const { data: invitationsData, error: invitationsError } = await supabase
     .from("invitations")
     .select("id, full_name, email, relationship, status")

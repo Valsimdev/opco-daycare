@@ -44,17 +44,19 @@ export function ChildSelector({ childList }: ChildSelectorProps) {
           </button>
         );
       })}
-      <button
-        type="button"
-        onClick={() => handleSelect("all")}
-        className={`rounded-full px-4 py-1.5 text-[14px] font-bold cursor-pointer ${
-          selectedChild === "all"
-            ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
-            : "border-[1.5px] border-border bg-surface text-ink-700"
-        }`}
-      >
-        Todos
-      </button>
+      {childList.length >= 2 && (
+        <button
+          type="button"
+          onClick={() => handleSelect("all")}
+          className={`rounded-full px-4 py-1.5 text-[14px] font-bold cursor-pointer ${
+            selectedChild === "all"
+              ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
+              : "border-[1.5px] border-border bg-surface text-ink-700"
+          }`}
+        >
+          Todos
+        </button>
+      )}
     </div>
   );
 }

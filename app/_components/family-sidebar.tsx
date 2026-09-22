@@ -13,7 +13,7 @@ interface FamilySidebarProps {
 function formatParentLabel(relationship: string | null, childrenNames: string[]): string {
   if (childrenNames.length === 0) return "";
 
-  const label = relationship === "padre" ? "Papá" : relationship === "madre" ? "Mamá" : "Tutor";
+  const label = relationship === "father" ? "Papá" : relationship === "mother" ? "Mamá" : "Tutor";
   const kids =
     childrenNames.length === 1
       ? childrenNames[0]

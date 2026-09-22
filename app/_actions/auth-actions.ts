@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string;
@@ -242,7 +243,10 @@ export async function activateAccountAction(formData: {
     }
 
     redirect("/auth/login?activated=1");
-  } catch {
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
     return { success: false, error: "Error inesperado al activar la cuenta." };
   }
 }
