@@ -241,7 +241,7 @@ export async function activateAccountAction(formData: {
         .eq("id", invitation.child_id);
     }
 
-    return { success: true };
+    redirect("/auth/login?activated=1");
   } catch {
     return { success: false, error: "Error inesperado al activar la cuenta." };
   }
