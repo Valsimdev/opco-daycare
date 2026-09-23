@@ -37,8 +37,9 @@ export async function updateSession(request: NextRequest) {
   const pathname = url.pathname;
 
   const isAuthRoute = pathname.startsWith("/auth");
+  const isPublicRoute = pathname.startsWith("/pokemon");
 
-  if (!session && !isAuthRoute) {
+  if (!session && !isAuthRoute && !isPublicRoute) {
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
