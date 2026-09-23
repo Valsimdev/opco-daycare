@@ -71,6 +71,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Agentes
 
+- `db-migrator` (`.opencode/agent/db-migrator.md`): Gestiona las migraciones de la base de datos Supabase: diagnostica el estado, crea archivos de migración con RLS obligatorio, aplica migraciones en orden y verifica el schema. Se activa con `/db-migrator status`, `/db-migrator apply`, `/db-migrator create` o `/db-migrator verify`.
 - `spec-verifier` (`.opencode/agent/spec-verifier.md`): Verifica, corrige y marca los criterios de aceptación de una spec tras su implementación. Usa Bash (lint/tsc), Playwright MCP (navegación, interacción y screenshots), Context7 (recomendaciones de Next.js/Tailwind) y visión para comparar screenshots con las plantillas `.dc.html`. Se activa al pedir verificar los checks de una spec o al terminar `/spec-impl`.
 
 # Reglas de código
