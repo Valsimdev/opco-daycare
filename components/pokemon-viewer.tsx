@@ -1,6 +1,7 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, startTransition, Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 interface PokemonData {
   id: number;
@@ -69,68 +70,57 @@ const statLabels: Record<string, string> = {
   speed: "Velocidad",
 };
 
+// ✅ Promise cache: ensures the same Promise instance is reused across renders.
+// Creating a new Promise on every render causes React to suspend repeatedly.
+const pokemonCache = new Map<number, Promise<PokemonData>>();
+
 function fetchPokemon(pokemonId: number): Promise<PokemonData> {
-  return fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`Pokémon #${pokemonId} no encontrado`);
-      return res.json();
+  if (!pokemonCache.has(pokemonId)) {
+    const promise = fetch(
+      `https://pokeapi.co/api/v2/pokemon/${pokemonId}`,
+    ).then((res) => {
+      if (!res.ok)
+        throw new Error(`Pokémon #${pokemonId} no encontrado`);
+      return res.json() as Promise<PokemonData>;
     });
+    pokemonCache.set(pokemonId, promise);
+  }
+  return pokemonCache.get(pokemonId)!;
 }
 
-export function PokemonViewer() {
-  const [id, setId] = useState(1);
+function refetchPokemon(pokemonId: number): Promise<PokemonData> {
+  pokemonCache.delete(pokemonId);
+  return fetchPokemon(pokemonId);
+}
 
-  const pokemonPromise = fetchPokemon(id);
+// ✅ Inner component that calls `use()` — must be wrapped in Suspense + ErrorBoundary.
+function PokemonContent({
+  pokemonPromise,
+}: {
+  pokemonPromise: Promise<PokemonData>;
+}) {
   const pokemon = use(pokemonPromise);
 
-  const navigate = (delta: number) => {
-    const next = id + delta;
-    if (next < 1) return;
-    setId(next);
-  };
+  const imageSrc =
+    pokemon.sprites.other["official-artwork"].front_default ??
+    pokemon.sprites.front_default ??
+    "";
+
+  const displayName = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
 
   return (
-    <div className="mx-auto max-w-lg rounded-2xl bg-surface p-6 shadow-lg">
-      <h1 className="mb-4 text-center text-2xl font-display font-bold text-ink-900">
-        Pokédex
-      </h1>
-
-      <div className="mb-4 flex items-center justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          disabled={id <= 1}
-          className="rounded-lg bg-coral-500 px-4 py-2 text-white transition hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          ← Anterior
-        </button>
-
-        <span className="font-display text-lg font-semibold text-ink-800">
-          #{String(id).padStart(3, "0")}
-        </span>
-
-        <button
-          onClick={() => navigate(1)}
-          className="rounded-lg bg-coral-500 px-4 py-2 text-white transition hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Siguiente →
-        </button>
-      </div>
-
+    <>
       <div>
         <div className="mb-4 flex justify-center">
           <img
-            src={
-              pokemon.sprites.other["official-artwork"].front_default ??
-              pokemon.sprites.front_default ??
-              ""
-            }
-            alt={pokemon.name}
+            src={imageSrc}
+            alt={`Ilustración de ${displayName}`}
             className="h-48 w-48 object-contain"
           />
         </div>
 
         <h2 className="mb-2 text-center text-xl font-display capitalize text-ink-900">
-          {pokemon.name}
+          {displayName}
         </h2>
 
         <div className="mb-4 flex justify-center gap-2">
@@ -171,13 +161,105 @@ export function PokemonViewer() {
               <div className="flex-1 overflow-hidden rounded-full bg-surface-muted">
                 <div
                   className="h-2 rounded-full bg-coral-500 transition-all"
-                  style={{ width: `${Math.min((s.base_stat / 255) * 100, 100)}%` }}
+                  style={{
+                    width: `${Math.min((s.base_stat / 255) * 100, 100)}%`,
+                  }}
                 />
               </div>
             </div>
           ))}
         </div>
       </div>
+    </>
+  );
+}
+
+function PokemonLoading() {
+  return (
+    <div className="flex flex-col items-center justify-center py-8 text-ink-600">
+      <div className="mb-2 h-6 w-6 animate-spin rounded-full border-4 border-coral-500 border-t-transparent" />
+      <span className="text-sm">Cargando Pokémon…</span>
+    </div>
+  );
+}
+
+// ✅ Parent component: manages state, wraps content with Suspense + ErrorBoundary.
+export function PokemonViewer() {
+  const [id, setId] = useState(1);
+  const [pokemonPromise, setPokemonPromise] = useState<Promise<PokemonData>>(
+    () => fetchPokemon(id),
+  );
+
+  const navigate = (delta: number) => {
+    const next = id + delta;
+    if (next < 1) return;
+    setId(next);
+    startTransition(() => {
+      setPokemonPromise(fetchPokemon(next));
+    });
+  };
+
+  function handleRetry() {
+    startTransition(() => {
+      setPokemonPromise(refetchPokemon(id));
+    });
+  }
+
+  return (
+    <div className="mx-auto max-w-lg rounded-2xl bg-surface p-6 shadow-lg">
+      <h1 className="mb-4 text-center text-2xl font-display font-bold text-ink-900">
+        Pokédex
+      </h1>
+
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          onClick={() => navigate(-1)}
+          disabled={id <= 1}
+          aria-label="Pokémon anterior"
+          className="rounded-lg bg-coral-500 px-4 py-2 text-white transition hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          ← Anterior
+        </button>
+
+        <span
+          className="font-display text-lg font-semibold text-ink-800"
+          aria-live="polite"
+        >
+          #{String(id).padStart(3, "0")}
+        </span>
+
+        <button
+          onClick={() => navigate(1)}
+          aria-label="Siguiente Pokémon"
+          className="rounded-lg bg-coral-500 px-4 py-2 text-white transition hover:bg-coral-600 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Siguiente →
+        </button>
+      </div>
+
+      <ErrorBoundary
+        resetKeys={[pokemonPromise]}
+        fallbackRender={({ resetErrorBoundary }) => (
+          <div className="rounded-lg bg-red-50 p-4 text-center">
+            <p className="mb-2 text-red-700">
+              No se pudo cargar el Pokémon.
+            </p>
+            <button
+              onClick={() => {
+                handleRetry();
+                resetErrorBoundary();
+              }}
+              className="rounded-lg bg-coral-500 px-4 py-2 text-white transition hover:bg-coral-600"
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
+      >
+        <Suspense fallback={<PokemonLoading />}>
+          <PokemonContent pokemonPromise={pokemonPromise} />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

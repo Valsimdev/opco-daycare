@@ -14,6 +14,7 @@ function parentLabel(count: number): string {
 
 export function KidCard({ kid, href }: KidCardProps) {
   const url = href ?? `/kids/${kid.id}`;
+  const firstBadge = kid.badges[0];
 
   return (
     <Link
@@ -34,12 +35,12 @@ export function KidCard({ kid, href }: KidCardProps) {
         </span>
       </div>
 
-      {kid.badges.length > 0 && (
+      {firstBadge && (
         <span
           className="shrink-0 rounded-full px-[9px] py-[5px] text-[11px] font-extrabold"
-          style={{ backgroundColor: kid.badges[0].bg, color: kid.badges[0].textColor }}
+          style={{ backgroundColor: firstBadge.bg, color: firstBadge.textColor }}
         >
-          {kid.badges[0].label}
+          {firstBadge.label}
         </span>
       )}
     </Link>
