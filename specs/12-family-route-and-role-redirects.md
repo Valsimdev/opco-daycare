@@ -1,6 +1,6 @@
 # SPEC 12 — Family route group and role-based redirects
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 03, SPEC 09, SPEC 11
 > **Fecha:** 2026-09-21
 > **Objetivo:** Crear el route group `(family)` con su layout y feed para padres, y modificar las redirecciones de login y activación para que cada role vaya a su ruta correspondiente.
@@ -95,20 +95,20 @@ WHERE pc.parent_id = $1;
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] La ruta `/family` existe y renderiza el feed de familia.
-- [ ] El layout de `(family)` incluye sidebar con navegación (Feed, Resumen del día, Mi cuenta) y perfil del usuario.
-- [ ] Un usuario con role `parent` autenticado puede acceder a `/family` sin redirecciones.
-- [ ] Un usuario con role `staff` que intenta acceder a `/family` es redirigido a `/`.
-- [ ] Un usuario no autenticado que intenta acceder a `/family` es redirigido a `/auth/login`.
-- [ ] `loginAction` redirige a `/` para usuarios con role `staff`.
-- [ ] `loginAction` redirige a `/family` para usuarios con role `parent`.
-- [ ] `activateAccountAction` mantiene la redirección a `/auth/login?activated=1` tras activar.
-- [ ] El feed de familia muestra saludo personalizado, selector de hijos y posts mock.
-- [ ] El sidebar de familia muestra nombre del usuario, "Mamá/Papá de [hijos]", y botón de logout funcional.
-- [ ] En viewport ≥1024px el feed muestra sidebar + contenido principal coincidente con `familia-feed.dc.html`.
-- [ ] En viewport <768px el sidebar se oculta y se muestra mobile nav.
-- [ ] Screenshots de verificación guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] La ruta `/family` existe y renderiza el feed de familia. (Archivo: `app/(family)/family/page.tsx`)
+- [x] El layout de `(family)` incluye sidebar con navegación (Feed, Resumen del día, Mi cuenta) y perfil del usuario. (`app/(family)/layout.tsx` + `FamilySidebar`)
+- [x] Un usuario con role `parent` autenticado puede acceder a `/family` sin redirecciones. (Verificado con sesión activa)
+- [x] Un usuario con role `staff` que intenta acceder a `/family` es redirigido a `/`. (Lógica en `layout.tsx` línea 25: `if (userRow.role !== "parent") redirect("/")`)
+- [x] Un usuario no autenticado que intenta acceder a `/family` es redirigido a `/auth/login`. (Verificado con Playwright: sin cookies → redirige a `/auth/login`)
+- [x] `loginAction` redirige a `/` para usuarios con role `staff`. (Línea 51: `redirect("/")`)
+- [x] `loginAction` redirige a `/family` para usuarios con role `parent`. (Línea 48: `redirect("/family")`)
+- [x] `activateAccountAction` mantiene la redirección a `/auth/login?activated=1` tras activar. (Línea 245: `redirect("/auth/login?activated=1")`)
+- [x] El feed de familia muestra saludo personalizado, selector de hijos y posts mock. (Verificado en screenshot desktop)
+- [x] El sidebar de familia muestra nombre del usuario, "Mamá/Papá de [hijos]", y botón de logout funcional. (Verificado en snapshot: "Test Parent", "Mamá de Benjamín Ruiz", botón "Cerrar sesión")
+- [x] En viewport ≥1024px el feed muestra sidebar + contenido principal coincidente con `familia-feed.dc.html`. (Screenshot: `family-feed-desktop_2026-09-23_03-49-06.png`)
+- [x] En viewport <768px el sidebar se oculta y se muestra mobile nav. (Screenshot: `family-feed-mobile_2026-09-23_03-49-10.png`)
+- [x] Screenshots de verificación guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
