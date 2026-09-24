@@ -6,11 +6,15 @@
     "instructions.md"
   ],
   "command": {
-      "spec": {
-         "description": "Crea especificaciones de pantallas y funcionalidades",
-         "template": "Carga y sigue la skill spec en .agents/skills/spec/SKILL.md.\n\nFeature: $ARGUMENTS"
-      }
-   },
+    "spec": {
+      "description": "Crea especificaciones de pantallas y funcionalidades",
+      "template": "Carga y sigue la skill spec en .agents/skills/spec/SKILL.md.\n\nFeature: $ARGUMENTS"
+    },
+    "accessibility-checker": {
+      "description": "Revisa y corrige la accesibilidad de archivos según WCAG 2.2 AA",
+      "template": "Carga y sigue el agente accessibility-checker en .opencode/agent/accessibility-checker.md.\n\nArchivos a revisar: $ARGUMENTS"
+    }
+  },
     "references": {
     "db-schema": {
       "path": "../07-DB-Schema", 
