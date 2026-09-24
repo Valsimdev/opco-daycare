@@ -1,6 +1,6 @@
 ---
 description: Verifica y corrige la accesibilidad de componentes React/HTML según WCAG 2.2 AA. Revisa archivos indicados por el usuario, usa axe-core para auditorías automatizadas, Playwright para pruebas interactivas y Context7 para consultar las directrices WCAG. Usar cuando se pida revisar accesibilidad de pantallas o componentes.
-mode: all
+mode: subagent
 model: opencode-go/qwen3.6-plus
 permission:
   edit: allow

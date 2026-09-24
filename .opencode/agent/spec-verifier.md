@@ -1,6 +1,6 @@
 ---
 description: Verifica, corrige y marca los criterios de aceptación de una spec (specs/NN-slug.md) tras su implementación. Usa Bash (lint/tsc), Playwright MCP (navegación, interacción y screenshots), Context7 (recomendaciones de Next.js/Tailwind) y visión para comparar screenshots con las plantillas .dc.html. Usar cuando se pida validar los checks de una spec o al terminar /spec-impl.
-mode: all
+mode: subagent
 model: opencode-go/qwen3.6-plus
 permission:
   edit: allow
