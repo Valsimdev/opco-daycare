@@ -8,6 +8,8 @@ interface AuthFieldProps {
   name?: string;
   variant?: "default" | "focus";
   onChange?: (value: string) => void;
+  ariaInvalid?: boolean;
+  ariaDescribedBy?: string;
 }
 
 export function AuthField({
@@ -18,6 +20,8 @@ export function AuthField({
   name,
   variant = "default",
   onChange,
+  ariaInvalid,
+  ariaDescribedBy,
 }: AuthFieldProps) {
   const [internalValue, setInternalValue] = useState(controlledValue ?? "");
 
@@ -34,15 +38,18 @@ export function AuthField({
 
   return (
     <div className="mb-[18px]">
-      <div className="mb-2 text-xs font-extrabold tracking-wider text-ink-600 uppercase">
+      <label htmlFor={name} className="mb-2 block text-xs font-extrabold tracking-wider text-ink-600 uppercase">
         {label}
-      </div>
+      </label>
       <input
+        id={name}
         name={name}
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedBy}
         className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-3.5 text-[15px] text-ink-900 transition-colors placeholder:text-[#B6A99B] ${
           variant === "focus"
             ? "border-[#F2A78E]"

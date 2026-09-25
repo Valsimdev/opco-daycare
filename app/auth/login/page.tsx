@@ -54,18 +54,22 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] bg-[#FBF4EC]">
-      <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-[#F6A98E] via-coral-400 to-[#EC7E62] p-[56px_60px] text-white">
+      <a href="#login-form" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-white text-ink-900 px-4 py-2 rounded-lg font-semibold shadow-lg">
+        Ir al formulario de inicio de sesión
+      </a>
+
+      <div className="hidden lg:flex relative flex-col justify-between overflow-hidden bg-gradient-to-br from-[#F6A98E] via-coral-400 to-[#EC7E62] p-[56px_60px] text-white" aria-hidden="true">
         <div className="absolute size-[420px] rounded-full bg-white/10 -top-[140px] -right-[120px]" />
         <div className="absolute size-[300px] rounded-full bg-white/10 -bottom-[110px] -left-[80px]" />
         <div className="relative">
           <AuthLogo />
         </div>
         <div className="relative">
-          <h1 className="font-display text-[42px] font-semibold leading-[1.12] mb-[18px]">
+          <p className="font-display text-[42px] font-semibold leading-[1.12] mb-[18px]">
             El día de cada niño,
             <br />
             compartido con su familia.
-          </h1>
+          </p>
           <p className="text-[17px] leading-[1.6] max-w-[430px] text-white/[0.92]">
             Publicá momentos, gestioná las salas y mantené a las familias cerca, desde un solo lugar.
           </p>
@@ -75,12 +79,12 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-[40px_20px] lg:p-[40px]">
+      <main className="flex items-center justify-center p-[40px_20px] lg:p-[40px]">
         <div className="w-full max-w-[392px]">
-          <h2 className="font-display text-[30px] font-semibold mb-1.5 text-ink-900">
+          <h1 className="font-display text-[30px] font-semibold mb-1.5 text-ink-900">
             Iniciar sesión
-          </h2>
-          <p className="mb-7 text-ink-600 text-[15px]">
+          </h1>
+          <p className="mb-7 text-ink-700 text-[15px]">
             Ingresá para ver el día de hoy.
           </p>
 
@@ -113,7 +117,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <form ref={formRef} action={handleSubmit}>
+          <form id="login-form" ref={formRef} action={handleSubmit}>
             <AuthField
               label="Email"
               type="email"
@@ -121,6 +125,8 @@ export default function LoginPage() {
               placeholder="tu@email.com"
               value={email}
               onChange={setEmail}
+              ariaInvalid={!!(validationError || error)}
+              ariaDescribedBy={(validationError || error) ? "login-error" : undefined}
             />
             <AuthField
               label="Contraseña"
@@ -129,28 +135,34 @@ export default function LoginPage() {
               placeholder="••••••••"
               value={password}
               onChange={setPassword}
+              ariaInvalid={!!(validationError || error)}
+              ariaDescribedBy={(validationError || error) ? "login-error" : undefined}
             />
             {(validationError || error) && (
-              <div className="mb-5 text-[13.5px] text-red-600 font-semibold text-center">
+              <div id="login-error" role="alert" className="mb-5 text-[13.5px] text-red-600 font-semibold text-center">
                 {validationError || error}
               </div>
             )}
             <div className="text-right mb-5">
-              <a href="#" className="text-coral-900 text-[13.5px] font-extrabold cursor-pointer">
+              <button
+                type="button"
+                aria-disabled="true"
+                className="text-coral-800 text-[13.5px] font-extrabold cursor-pointer bg-transparent border-none p-0"
+              >
                 ¿Olvidaste tu contraseña?
-              </a>
+              </button>
             </div>
             <SubmitButton loading={loading} />
           </form>
 
-          <p className="mt-6 text-center text-[14.5px] text-ink-600">
+          <p className="mt-6 text-center text-[14.5px] text-ink-700">
             ¿Te invitó la guardería?{" "}
-            <a href="/auth/activate" className="text-coral-900 font-extrabold">
+            <a href="/auth/activate" className="text-coral-800 font-extrabold">
               Activá tu cuenta
             </a>
           </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

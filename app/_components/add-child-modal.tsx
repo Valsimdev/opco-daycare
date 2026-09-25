@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createChild } from "@/app/_actions/child-actions";
 import { validateDate } from "@/app/_lib/validate-date";
 
@@ -25,34 +25,87 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const resetForm = () => {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  // Keep a ref to the latest onClose to avoid stale closures in effects
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  const resetForm = useCallback(() => {
     setFullName("");
     setBirthDate("");
     setRoom("");
     setAllergies("");
     setMedicalNotes("");
     setErrors({});
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetForm();
-    onClose();
-  };
+    onCloseRef.current();
+  }, [resetForm]);
 
+  // Focus management, body scroll lock, and Escape key handler
   useEffect(() => {
     if (!open) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") handleClose();
-    };
-    document.addEventListener("keydown", handleKey);
+
+    // Save the currently focused element to restore focus later
+    previouslyFocusedRef.current = document.activeElement as HTMLElement;
+
+    // Lock body scroll — preserve previous overflow value
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // Focus the modal panel for accessibility
+    modalRef.current?.focus();
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        handleClose();
+      }
+
+      // Simple focus trap: keep Tab within the modal
+      if (e.key === "Tab" && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKey);
+
     return () => {
       document.removeEventListener("keydown", handleKey);
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+      document.body.style.overflow = previousOverflow;
 
-  const handleSave = async () => {
+      // Restore focus to the element that was focused before the modal opened
+      previouslyFocusedRef.current?.focus();
+    };
+  }, [open, handleClose]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     const newErrors: typeof errors = {};
 
     if (!fullName.trim()) {
@@ -89,7 +142,7 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
       if (res.success) {
         resetForm();
         onChildCreated?.();
-        onClose();
+        onCloseRef.current();
       } else {
         setSaveError(res.error || "Error al guardar el niño");
       }
@@ -102,34 +155,37 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
     }
   };
 
-  const handleCancel = () => {
-    handleClose();
-  };
-
   if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 sm:p-10"
       onClick={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-child-modal-title"
     >
-      <div className="w-full max-w-[520px] rounded-[16px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)] sm:mx-4 sm:rounded-[24px]">
+      <div
+        ref={modalRef}
+        tabIndex={-1}
+        className="w-full max-w-[520px] rounded-[16px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)] sm:mx-4 sm:rounded-[24px] outline-none"
+      >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-[20px]">
           <button
             type="button"
             className="text-[15px] font-bold text-[#94887B] hover:underline"
-            onClick={handleCancel}
+            onClick={handleClose}
           >
             Cancelar
           </button>
-          <span className="font-display text-[18px] font-semibold text-ink-900">
+          <span id="add-child-modal-title" className="font-display text-[18px] font-semibold text-ink-900">
             Agregar niño
           </span>
           <button
-            type="button"
+            type="submit"
+            form="add-child-form"
             className="text-[15px] font-extrabold text-[#D9583C] hover:underline disabled:opacity-50"
-            onClick={handleSave}
             disabled={saving}
           >
             {saving ? "Guardando…" : "Guardar"}
@@ -137,12 +193,13 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
         </div>
 
         {/* Form */}
-        <div className="px-[26px] pb-[26px] pt-[24px]">
+        <form id="add-child-form" onSubmit={handleSubmit} className="px-[26px] pb-[26px] pt-[24px]">
           {/* Nombre completo */}
-          <label className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
+          <label htmlFor="child-fullName" className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             NOMBRE COMPLETO
           </label>
           <input
+            id="child-fullName"
             type="text"
             placeholder="Ej. Martina López"
             value={fullName}
@@ -152,6 +209,8 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                 setErrors((prev) => ({ ...prev, fullName: undefined }));
               }
             }}
+            aria-invalid={!!errors.fullName}
+            aria-describedby={errors.fullName ? "child-fullName-error" : undefined}
             className={`mb-[18px] w-full rounded-[14px] border bg-[#fff] px-4 py-[13px] text-[15px] text-ink-900 placeholder:text-[#B6A99B] ${
               errors.fullName
                 ? "border-red-500"
@@ -159,7 +218,7 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
             }`}
           />
           {errors.fullName && (
-            <p className="-mt-[14px] mb-[18px] text-[13px] text-red-500">
+            <p id="child-fullName-error" className="-mt-[14px] mb-[18px] text-[13px] text-red-500" role="alert">
               {errors.fullName}
             </p>
           )}
@@ -167,10 +226,11 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
           {/* Fecha de nacimiento + Sala */}
           <div className="mb-[18px] flex gap-[14px]">
             <div className="flex-1">
-              <label className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
+              <label htmlFor="child-birthDate" className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
                 FECHA DE NACIMIENTO
               </label>
               <input
+                id="child-birthDate"
                 type="text"
                 placeholder="dd/mm/aaaa"
                 value={birthDate}
@@ -183,6 +243,8 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                     }
                   }
                 }}
+                aria-invalid={!!errors.birthDate}
+                aria-describedby={errors.birthDate ? "child-birthDate-error" : undefined}
                 className={`w-full rounded-[14px] border bg-[#fff] px-4 py-[13px] text-[15px] text-ink-900 placeholder:text-[#B6A99B] ${
                   errors.birthDate
                     ? "border-red-500"
@@ -190,17 +252,18 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                 }`}
               />
               {errors.birthDate && (
-                <p className="mt-1 text-[13px] text-red-500">
+                <p id="child-birthDate-error" className="mt-1 text-[13px] text-red-500" role="alert">
                   {errors.birthDate}
                 </p>
               )}
             </div>
             <div className="flex-1">
-              <label className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
+              <label htmlFor="child-room" className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
                 SALA
               </label>
               <div className="relative">
                 <select
+                  id="child-room"
                   value={room}
                   onChange={(e) => {
                     setRoom(e.target.value);
@@ -208,6 +271,8 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                       setErrors((prev) => ({ ...prev, room: undefined }));
                     }
                   }}
+                  aria-invalid={!!errors.room}
+                  aria-describedby={errors.room ? "child-room-error" : undefined}
                   className={`w-full appearance-none rounded-[14px] border bg-[#fff] px-4 py-[13px] pr-10 text-[15px] text-ink-900 ${
                     !room
                       ? "text-[#B6A99B]"
@@ -222,7 +287,7 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                     Seleccionar sala
                   </option>
                   {rooms.map((r) => (
-                    <option key={r.id} value={r.name}>
+                    <option key={r.id} value={r.id}>
                       {r.name}
                     </option>
                   ))}
@@ -237,21 +302,23 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
                   strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  aria-hidden="true"
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </div>
               {errors.room && (
-                <p className="mt-1 text-[13px] text-red-500">{errors.room}</p>
+                <p id="child-room-error" className="mt-1 text-[13px] text-red-500" role="alert">{errors.room}</p>
               )}
             </div>
           </div>
 
           {/* Alergias */}
-          <label className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
+          <label htmlFor="child-allergies" className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             ALERGIAS (ETIQUETAS)
           </label>
           <input
+            id="child-allergies"
             type="text"
             placeholder="Ej. Maní, Lactosa"
             value={allergies}
@@ -260,10 +327,11 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
           />
 
           {/* Notas médicas */}
-          <label className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
+          <label htmlFor="child-medicalNotes" className="mb-[8px] block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             NOTAS MÉDICAS
           </label>
           <textarea
+            id="child-medicalNotes"
             placeholder="Indicaciones, medicación, contactos…"
             value={medicalNotes}
             onChange={(e) => setMedicalNotes(e.target.value)}
@@ -272,9 +340,9 @@ export default function AddChildModal({ open, onClose, onChildCreated, rooms }: 
           />
 
           {saveError && (
-            <p className="mt-[14px] text-[13px] text-red-500">{saveError}</p>
+            <p className="mt-[14px] text-[13px] text-red-500" role="alert">{saveError}</p>
           )}
-        </div>
+        </form>
       </div>
     </div>
   );

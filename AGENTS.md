@@ -71,7 +71,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Agentes
 
+- `db-migrator` (`.opencode/agent/db-migrator.md`): Gestiona las migraciones de la base de datos Supabase: diagnostica el estado, crea archivos de migración con RLS obligatorio, aplica migraciones en orden y verifica el schema. Se activa con `/db-migrator status`, `/db-migrator apply`, `/db-migrator create` o `/db-migrator verify`.
 - `spec-verifier` (`.opencode/agent/spec-verifier.md`): Verifica, corrige y marca los criterios de aceptación de una spec tras su implementación. Usa Bash (lint/tsc), Playwright MCP (navegación, interacción y screenshots), Context7 (recomendaciones de Next.js/Tailwind) y visión para comparar screenshots con las plantillas `.dc.html`. Se activa al pedir verificar los checks de una spec o al terminar `/spec-impl`.
+- `react-best-practices` (`.opencode/agent/react-best-practices.md`): Verifica y corrige las mejores prácticas de React en archivos indicados por el usuario, usando Context7 para consultar la documentación oficial actualizada.
+- `accessibility-checker` (`.opencode/agent/accessibility-checker.md`): Revisa y corrige problemas de accesibilidad en archivos según WCAG 2.2 AA. Usa axe-core para auditorías automatizadas, Playwright para pruebas interactivas (teclado, snapshots, labels) y Context7 para consultar las directrices WCAG. Se activa con `/accessibility-checker <archivos>`.
+- `db-security-auditor` (`.opencode/agent/db-security-auditor.md`): Audita la seguridad de la base de datos Supabase para prevenir fugas de datos entre niños y padres. Revisa RLS, privilegios, funciones SECURITY DEFINER, views, políticas de ownership y exposición de tablas. Se activa con `/db-security-auditor full`, `/db-security-auditor rls`, `/db-security-auditor privileges`, `/db-security-auditor functions` o `/db-security-auditor logs`.
 
 # Reglas de código
 

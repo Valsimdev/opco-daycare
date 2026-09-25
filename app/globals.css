@@ -13,7 +13,7 @@
   --color-ink-900: #3f362e;
   --color-ink-800: #4a4038;
   --color-ink-700: #6e6359;
-  --color-ink-600: #8a7c6d;
+  --color-ink-600: #7a6d5f;
   --color-ink-500: #94887b;
   --color-ink-400: #a89a8b;
   --color-ink-300: #b0a290;
@@ -23,8 +23,8 @@
   --color-coral-500: #f4977e;
   --color-coral-600: #ee8164;
   --color-coral-700: #e0654a;
-  --color-coral-800: #d9583c;
-  --color-coral-900: #c5503a;
+  --color-coral-800: #c24d36;
+  --color-coral-900: #b04432;
 
   --color-peach: #fbe3d8;
   --color-sky-light: #a9d9e8;
@@ -49,6 +49,11 @@ body {
   color: var(--color-ink-900);
   font-family: var(--font-nunito), system-ui, sans-serif;
   line-height: normal;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-coral-500);
+  outline-offset: 2px;
 }
 
 ::-webkit-scrollbar {

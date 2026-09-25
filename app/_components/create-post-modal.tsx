@@ -21,7 +21,7 @@ export interface CreatePostModalProps {
 export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
+  const [selectedChildren, setSelectedChildren] = useState<string[]>([kids[0].id]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
@@ -64,23 +64,17 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     }
   };
 
-  const handleChildToggle = (childId: string) => {
-    if (isAllSelected) {
-      setIsAllSelected(false);
-      setSelectedChildren([childId]);
-      return;
-    }
+  const handleChildSelect = (childId: string) => {
+    setIsAllSelected(false);
     setSelectedChildren((prev) =>
-      prev.includes(childId) ? prev.filter((id) => id !== childId) : [...prev, childId],
+      prev.includes(childId) ? [] : [childId],
     );
   };
 
-  const handleAllToggle = () => {
-    if (selectedChildren.length > 0) {
+  const handleAllSelect = () => {
+    setIsAllSelected((prev) => !prev);
+    if (!isAllSelected) {
       setSelectedChildren([]);
-      setIsAllSelected(true);
-    } else {
-      setIsAllSelected(false);
     }
   };
 
@@ -128,7 +122,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                 <button
                   key={child.id}
                   type="button"
-                  onClick={() => handleChildToggle(child.id)}
+                  onClick={() => handleChildSelect(child.id)}
                   className={`flex cursor-pointer items-center gap-2 rounded-full px-2 py-1.5 text-[14px] font-bold transition-all ${
                     isSelected
                       ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"
@@ -151,7 +145,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             })}
             <button
               type="button"
-              onClick={handleAllToggle}
+              onClick={handleAllSelect}
               className={`cursor-pointer rounded-full px-4 py-1.5 text-[14px] font-bold transition-all ${
                 isAllSelected
                   ? "border-[1.5px] border-ink-900 bg-ink-900 text-white"

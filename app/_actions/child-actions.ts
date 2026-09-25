@@ -45,11 +45,11 @@ export async function createChild(formData: {
     const [day, month, year] = parts;
     const sqlDate = `${year}-${month}-${day}`;
 
-    // Get room_id from room name
+    // Get room by id
     const { data: room, error: roomError } = await supabase
       .from("rooms")
       .select("id")
-      .eq("name", formData.room)
+      .eq("id", formData.room)
       .single();
 
     if (roomError || !room) {
