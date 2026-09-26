@@ -8,9 +8,14 @@ interface MobileNavProps {
   userName: string;
   userInitial: string;
   userRole: string;
+  roomName: string;
+  childrenCount: number;
+  dateLabel: string;
+  roomId: string | null;
+  kids: Array<{ id: string; full_name: string }>;
 }
 
-export function MobileNav({ userName, userInitial, userRole }: MobileNavProps) {
+export function MobileNav({ userName, userInitial, userRole, roomName, childrenCount, dateLabel, roomId, kids }: MobileNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -52,7 +57,16 @@ export function MobileNav({ userName, userInitial, userRole }: MobileNavProps) {
             className="absolute inset-0 bg-ink-900/40"
           />
           <div className="absolute left-0 top-0 h-full">
-            <Sidebar userName={userName} userInitial={userInitial} userRole={userRole} />
+            <Sidebar
+              userName={userName}
+              userInitial={userInitial}
+              userRole={userRole}
+              roomName={roomName}
+              childrenCount={childrenCount}
+              dateLabel={dateLabel}
+              roomId={roomId}
+              kids={kids}
+            />
           </div>
         </div>
       ) : null}

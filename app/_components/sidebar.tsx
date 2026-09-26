@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { classroom } from "@/app/_data/mock";
 import { Avatar } from "./avatar";
 import { NavLink } from "./nav-link";
 import { logoutAction } from "@/app/_actions/auth-actions";
@@ -12,10 +11,16 @@ interface SidebarProps {
   userName: string;
   userInitial: string;
   userRole: string;
+  roomName: string;
+  childrenCount: number;
+  dateLabel: string;
+  roomId: string | null;
+  kids: Array<{ id: string; full_name: string }>;
 }
 
-export function Sidebar({ userName, userInitial, userRole }: SidebarProps) {
+export function Sidebar({ userName, userInitial, userRole, roomName, childrenCount, dateLabel, roomId, kids }: SidebarProps) {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
+
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] shrink-0 flex-col border-r border-border bg-surface px-4 py-6">
       <Link href="/" className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
@@ -37,7 +42,7 @@ export function Sidebar({ userName, userInitial, userRole }: SidebarProps) {
         </div>
         <div>
           <div className="font-display text-[17px] font-semibold leading-none text-ink-900">OpenDayCare</div>
-          <div className="mt-0.5 text-[11.5px] text-ink-400">Sala {classroom.name}</div>
+          <div className="mt-0.5 text-[11.5px] text-ink-400">Sala {roomName}</div>
         </div>
       </Link>
 
@@ -61,7 +66,15 @@ export function Sidebar({ userName, userInitial, userRole }: SidebarProps) {
         </svg>
         Nueva publicación
       </button>
-      <CreatePostModal open={showCreatePostModal} onClose={() => setShowCreatePostModal(false)} />
+      <CreatePostModal
+        open={showCreatePostModal}
+        onClose={() => setShowCreatePostModal(false)}
+        kids={kids}
+        roomId={roomId}
+        roomName={roomName}
+        childrenCount={childrenCount}
+        dateLabel={dateLabel}
+      />
 
       <nav className="flex flex-1 flex-col gap-1">
         <NavLink
