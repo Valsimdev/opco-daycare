@@ -151,7 +151,7 @@ export function PostCard({ post }: PostCardProps) {
             {data.time} · publicado por {data.author_name.split(" ")[0]}
           </div>
         </div>
-        <TagBadge type={data.type as Parameters<typeof TagBadge>[0]["type"]} />
+        <TagBadge type={data.type} />
       </header>
 
       <p className="mb-2.5 text-[12.5px] text-ink-400">Para: {recipients}</p>
