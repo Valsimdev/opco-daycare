@@ -1,6 +1,6 @@
 # SPEC 13 — Staff feed + crear publicación con DB
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 06, SPEC 07, SPEC 08, SPEC 11
 > **Fecha:** 2026-09-25
 > **Objetivo:** Conectar el feed de staff con Supabase: migraciones para `posts`, `post_children`, `post_photos`; modal de crear publicación con persistencia real, upload de 1-3 fotos a Storage, y feed que carga publicaciones reales con carousel de fotos.
@@ -260,23 +260,23 @@ type PostType = 'meal' | 'nap' | 'activity' | 'achievement' | 'mood' | 'photo' |
 
 ## Criterios de aceptación
 
-- [ ] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
-- [ ] La migración se aplica sin errores y crea las tablas `posts`, `post_children`, `post_photos` y enum `post_type` con 7 valores.
-- [ ] RLS habilitado en `posts`, `post_children`, `post_photos`.
-- [ ] Bucket `post-photos` creado con límite 3 MB y tipos MIME permitidos.
-- [ ] El modal "Nueva publicación" carga niños reales desde DB.
-- [ ] Se puede seleccionar un solo niño en "Para".
-- [ ] Se pueden seleccionar múltiples niños en "Para".
-- [ ] Al presionar "Toda la sala" se deseleccionan todos los niños individuales.
-- [ ] Se pueden seleccionar 1-3 fotos (máx 3 MB cada una) con preview de thumbnails.
-- [ ] Al publicar se guarda el post en DB, se suben fotos a Storage y se crean registros en `post_children`.
-- [ ] El feed carga publicaciones reales desde DB.
-- [ ] Posts ordenados por `published_at DESC` y agrupados por día.
-- [ ] Publicación con 0 fotos: muestra solo texto, sin sección de imagen.
-- [ ] Publicación con 1 foto: muestra imagen estática sin flechas.
-- [ ] Publicación con 2-3 fotos: muestra carousel con flechas overlay navegables por click y drag.
-- [ ] Estado vacío del feed: solo muestra "Compartí un momento…" sin posts ni mensajes adicionales.
-- [ ] Screenshots de verificación guardados en `.playwright-mcp/screenshots/`.
+- [x] `npm run lint` y `npx tsc --noEmit` pasan sin errores.
+- [x] La migración se aplica sin errores y crea las tablas `posts`, `post_children`, `post_photos` y enum `post_type` con 7 valores.
+- [x] RLS habilitado en `posts`, `post_children`, `post_photos`.
+- [x] Bucket `post-photos` creado con límite 3 MB y tipos MIME permitidos.
+- [x] El modal "Nueva publicación" carga niños reales desde DB.
+- [x] Se puede seleccionar un solo niño en "Para".
+- [x] Se pueden seleccionar múltiples niños en "Para".
+- [x] Al presionar "Toda la sala" se deseleccionan todos los niños individuales.
+- [x] Se pueden seleccionar 1-3 fotos (máx 3 MB cada una) con preview de thumbnails.
+- [x] Al publicar se guarda el post en DB, se suben fotos a Storage y se crean registros en `post_children`.
+- [x] El feed carga publicaciones reales desde DB.
+- [x] Posts ordenados por `published_at DESC` y agrupados por día.
+- [x] Publicación con 0 fotos: muestra solo texto, sin sección de imagen.
+- [x] Publicación con 1 foto: muestra imagen estática sin flechas.
+- [x] Publicación con 2-3 fotos: muestra carousel con flechas overlay navegables por click y drag.
+- [x] Estado vacío del feed: solo muestra "Compartí un momento…" sin posts ni mensajes adicionales.
+- [x] Screenshots de verificación guardados en `.playwright-mcp/screenshots/`.
 
 ## Decisiones
 
