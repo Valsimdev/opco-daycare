@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { kids } from "@/app/_data/mock";
+import { createPostAction } from "@/app/_actions/post-actions";
 
 const postTypes = [
   { label: "Comida", color: "#9A7B1E", textColor: "#fff" },
@@ -13,17 +13,29 @@ const postTypes = [
   { label: "Anuncio", color: "#CCD8F4", textColor: "#4E72C8" },
 ] as const;
 
-export interface CreatePostModalProps {
+const MAX_PHOTOS = 3;
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
+
+interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
+  kids: Array<{ id: string; full_name: string }>;
+  roomId: string | null;
+  roomName: string;
+  childrenCount: number;
+  dateLabel: string;
 }
 
-export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
+export function CreatePostModal({ open, onClose, kids: roomKids, roomId, roomName }: CreatePostModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedChildren, setSelectedChildren] = useState<string[]>([kids[0].id]);
+  const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
   const [isAllSelected, setIsAllSelected] = useState(false);
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [body, setBody] = useState("");
+  const [photos, setPhotos] = useState<Array<{ file: File; preview: string }>>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -40,6 +52,10 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     setSelectedChildren([]);
     setIsAllSelected(false);
     setSelectedType(null);
+    setBody("");
+    setPhotos([]);
+    setIsSubmitting(false);
+    setError(null);
     onClose();
   }, [onClose]);
 
@@ -67,15 +83,115 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
   const handleChildSelect = (childId: string) => {
     setIsAllSelected(false);
     setSelectedChildren((prev) =>
-      prev.includes(childId) ? [] : [childId],
+      prev.includes(childId)
+        ? prev.filter((id) => id !== childId)
+        : [...prev, childId],
     );
   };
 
   const handleAllSelect = () => {
-    setIsAllSelected((prev) => !prev);
-    if (!isAllSelected) {
-      setSelectedChildren([]);
+    setIsAllSelected((prev) => {
+      const newVal = !prev;
+      if (newVal) {
+        setSelectedChildren([]);
+      }
+      return newVal;
+    });
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const remaining = MAX_PHOTOS - photos.length;
+    const toAdd = files.slice(0, remaining);
+
+    const validFiles = toAdd.filter((f) => f.size <= MAX_FILE_SIZE);
+
+    const newPhotos = validFiles.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+
+    setPhotos((prev) => [...prev, ...newPhotos].slice(0, MAX_PHOTOS));
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => {
+      const removed = prev[index];
+      if (removed) {
+        URL.revokeObjectURL(removed.preview);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleSubmit = async () => {
+    setError(null);
+
+    if (!selectedType) {
+      setError("Seleccioná un tipo de publicación.");
+      return;
+    }
+
+    if (!body.trim()) {
+      setError("La descripción no puede estar vacía.");
+      return;
+    }
+
+    if (!isAllSelected && selectedChildren.length === 0) {
+      setError("Seleccioná al menos un niño o toda la sala.");
+      return;
+    }
+
+    if (photos.length > MAX_PHOTOS) {
+      setError(`Máximo ${MAX_PHOTOS} fotos permitidas.`);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("type", selectedType);
+    formData.append("body", body);
+    formData.append("wholeRoom", isAllSelected ? "true" : "false");
+    formData.append("childIds", selectedChildren.join(","));
+    formData.append("roomId", roomId ?? "");
+
+    photos.forEach((photo, index) => {
+      formData.append(`photo_${index}`, photo.file);
+    });
+
+    const result = await createPostAction(formData);
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+
+    handleClose();
+  };
+
+  const childInitial = (name: string) => name.charAt(0).toUpperCase();
+
+  const AVATAR_COLORS = [
+    { bg: "#A9D9E8", textColor: "#1F7A93" },
+    { bg: "#F4B8CC", textColor: "#C44A7A" },
+    { bg: "#B9DEC4", textColor: "#3E8B62" },
+    { bg: "#F4DC8E", textColor: "#9A7B1E" },
+    { bg: "#C9B6E8", textColor: "#7B5FC0" },
+  ];
+
+  const getAvatarColor = (name: string) => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
   };
 
   return (
@@ -93,7 +209,8 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           <button
             type="button"
             onClick={handleClose}
-            className="cursor-pointer text-[15px] font-bold text-ink-500 hover:opacity-80"
+            disabled={isSubmitting}
+            className="cursor-pointer text-[15px] font-bold text-ink-500 hover:opacity-80 disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -102,12 +219,20 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </span>
           <button
             type="button"
-            onClick={handleClose}
-            className="cursor-pointer text-[15px] font-extrabold text-coral-800 hover:opacity-80"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="cursor-pointer text-[15px] font-extrabold text-coral-800 hover:opacity-80 disabled:opacity-50"
           >
-            Publicar
+            {isSubmitting ? "Publicando..." : "Publicar"}
           </button>
         </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mx-6 mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <div className="px-6 py-6">
@@ -116,8 +241,9 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             PARA
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
-            {kids.map((child) => {
+            {roomKids.map((child) => {
               const isSelected = selectedChildren.includes(child.id);
+              const { bg, textColor } = getAvatarColor(child.full_name);
               return (
                 <button
                   key={child.id}
@@ -132,14 +258,11 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                 >
                   <span
                     className="flex size-[26px] shrink-0 items-center justify-center rounded-full font-display text-[13px] font-semibold"
-                    style={{
-                      background: child.avatarBg,
-                      color: child.avatarTextColor,
-                    }}
+                    style={{ background: bg, color: textColor }}
                   >
-                    {child.avatarInitial}
+                    {childInitial(child.full_name)}
                   </span>
-                  {child.name.split(" ")[0]}
+                  {child.full_name.split(" ")[0]}
                 </button>
               );
             })}
@@ -190,56 +313,79 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
           </div>
           <textarea
             placeholder="Contá cómo le fue hoy…"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
             className="mb-[22px] min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] leading-[1.5] text-ink-900 placeholder:text-[#B6A99B]"
           />
 
           {/* FOTOS */}
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-ink-500">
-            FOTOS
+            FOTOS {photos.length > 0 && `(${photos.length}/${MAX_PHOTOS})`}
           </div>
-          <div className="flex gap-3">
-            <div className="flex size-[96px] items-center justify-center rounded-[14px] border border-border bg-surface-muted text-[#CBB89F]">
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="9" cy="9" r="2" />
-                <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
-              </svg>
-            </div>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex size-[96px] flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-border-muted bg-surface-muted text-ink-300 cursor-pointer"
-            >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#C5503A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span className="text-[12px]">Agregar</span>
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-            />
+          <div className="flex flex-wrap gap-3">
+            {photos.map((photo, index) => (
+              <div key={index} className="relative size-[96px]">
+                <img
+                  src={photo.preview}
+                  alt={`Preview ${index + 1}`}
+                  className="size-[96px] rounded-[14px] object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removePhoto(index)}
+                  className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold cursor-pointer"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {photos.length < MAX_PHOTOS && (
+              <>
+                <div className="flex size-[96px] items-center justify-center rounded-[14px] border border-border bg-surface-muted text-[#CBB89F]">
+                  <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
+                  </svg>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex size-[96px] flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-border-muted bg-surface-muted text-ink-300 cursor-pointer"
+                >
+                  <svg
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#C5503A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  <span className="text-[12px]">Agregar</span>
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
