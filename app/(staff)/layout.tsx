@@ -29,7 +29,7 @@ export default async function StaffLayout({ children }: LayoutProps<"/">) {
   const userInitial = userRow.full_name.charAt(0).toUpperCase();
   const userRole = userRow.role.charAt(0).toUpperCase() + userRow.role.slice(1);
 
-  // Obtener la sala (room) del daycare
+  // Obtener las salas (rooms) del daycare
   let roomId: string | null = null;
   let roomName = "Soles";
   let kidsCount = 0;
@@ -37,20 +37,23 @@ export default async function StaffLayout({ children }: LayoutProps<"/">) {
   const roomChildren: Array<{ id: string; full_name: string }> = [];
 
   if (userRow.daycare_id) {
-    const { data: room } = await supabase
+    const { data: rooms } = await supabase
       .from("rooms")
       .select("id, name")
       .eq("daycare_id", userRow.daycare_id)
-      .single();
+      .order("name");
 
-    if (room) {
-      roomId = room.id;
-      roomName = room.name;
+    if (rooms && rooms.length > 0) {
+      // Use the first room as default for roomId/roomName
+      roomId = rooms[0].id;
+      roomName = rooms[0].name;
 
+      // Get children from all rooms
+      const roomIds = rooms.map((r) => r.id);
       const { data: kids } = await supabase
         .from("children")
         .select("id, full_name")
-        .eq("room_id", room.id)
+        .in("room_id", roomIds)
         .eq("status", "active")
         .order("full_name");
 

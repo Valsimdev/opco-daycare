@@ -151,7 +151,7 @@ export function PostCard({ post }: PostCardProps) {
             {data.time} · publicado por {data.author_name.split(" ")[0]}
           </div>
         </div>
-        <TagBadge type={data.type as Parameters<typeof TagBadge>[0]["type"]} />
+        <TagBadge type={data.type} />
       </header>
 
       <p className="mb-2.5 text-[12.5px] text-ink-400">Para: {recipients}</p>
@@ -159,12 +159,11 @@ export function PostCard({ post }: PostCardProps) {
 
       {/* Photos section */}
       {hasPhotos && !showCarousel && data.photos.length === 1 && (
-        <div className="mt-3.5 overflow-hidden rounded-2xl">
+        <div className="mt-3.5 overflow-hidden rounded-2xl" style={{ aspectRatio: "16 / 9" }}>
           <img
             src={data.photos[0].url}
             alt={`Foto de ${data.title}`}
-            className="w-full object-cover"
-            style={{ maxHeight: "320px" }}
+            className="h-full w-full object-cover"
           />
         </div>
       )}
@@ -181,12 +180,11 @@ export function PostCard({ post }: PostCardProps) {
             onTouchEnd={(e) => handleDragEnd(e.changedTouches[0].clientX)}
           >
             {data.photos.map((photo, idx) => (
-              <div key={idx} className="min-w-full shrink-0">
+              <div key={idx} className="relative w-full shrink-0" style={{ aspectRatio: "16 / 9" }}>
                 <img
                   src={photo.url}
                   alt={`Foto ${idx + 1} de ${data.title}`}
-                  className="w-full object-cover"
-                  style={{ maxHeight: "320px" }}
+                  className="h-full w-full object-cover"
                 />
               </div>
             ))}

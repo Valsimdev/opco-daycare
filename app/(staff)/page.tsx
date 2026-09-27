@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { PostCard, PostCardData } from "@/app/_components/post-card";
 import { getFeedPosts } from "@/app/_actions/feed-actions";
-import { getCurrentUserRoom } from "@/app/_actions/room-actions";
 
 function formatDateGroup(publishedAt: string): string {
   const postDate = new Date(publishedAt);
@@ -44,9 +43,7 @@ export default async function FeedPage() {
     .eq("id", user.id)
     .single();
 
-  const roomId = userRow?.daycare_id ? await getCurrentUserRoom(user.id) : null;
-
-  const posts = await getFeedPosts(roomId);
+  const posts = await getFeedPosts(userRow?.daycare_id ?? null);
 
   const grouped: Record<string, typeof posts> = {};
   for (const post of posts) {
@@ -66,18 +63,19 @@ export default async function FeedPage() {
   let childrenCount = 0;
 
   if (userRow?.daycare_id) {
-    const { data: room } = await supabase
+    const { data: rooms } = await supabase
       .from("rooms")
-      .select("name")
+      .select("id, name")
       .eq("daycare_id", userRow.daycare_id)
-      .single();
+      .order("name");
 
-    if (room) {
-      roomName = room.name;
+    if (rooms && rooms.length > 0) {
+      roomName = rooms[0].name;
+      const roomIds = rooms.map((r) => r.id);
       const { data: kids } = await supabase
         .from("children")
         .select("id")
-        .eq("room_id", (await getCurrentUserRoom(user.id)) ?? "")
+        .in("room_id", roomIds)
         .eq("status", "active");
 
       childrenCount = kids?.length ?? 0;
