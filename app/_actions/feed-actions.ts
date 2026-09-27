@@ -26,11 +26,28 @@ export interface PostRow {
   photos: PostPhoto[];
 }
 
-export async function getFeedPosts(roomId: string | null): Promise<PostRow[]> {
+export async function getFeedPosts(daycareId: string | null): Promise<PostRow[]> {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  // Get posts for the room or general announcements
+  if (!daycareId) {
+    return [];
+  }
+
+  // Get all room IDs for this daycare
+  const { data: rooms, error: roomsError } = await supabase
+    .from("rooms")
+    .select("id")
+    .eq("daycare_id", daycareId);
+
+  if (roomsError) {
+    console.error("Error fetching rooms:", roomsError);
+    return [];
+  }
+
+  const roomIds = rooms?.map((r) => r.id) ?? [];
+
+  // Get posts for all rooms in the daycare or general announcements
   let query = supabase
     .from("posts")
     .select(
@@ -43,14 +60,15 @@ export async function getFeedPosts(roomId: string | null): Promise<PostRow[]> {
       body,
       published_at,
       users!inner(full_name),
-      post_children(child_id, children!inner(id, full_name)),
+      post_children(child_id, children(id, full_name)),
       post_photos(id, url, width, height, position)
       `
     )
     .order("published_at", { ascending: false });
 
-  if (roomId) {
-    query = query.or(`room_id.eq.${roomId},room_id.is.null`);
+  if (roomIds.length > 0) {
+    const orClause = roomIds.map((id) => `room_id.eq.${id}`).join(",") + ",room_id.is.null";
+    query = query.or(orClause);
   } else {
     query = query.is("room_id", null);
   }
@@ -68,7 +86,7 @@ export async function getFeedPosts(roomId: string | null): Promise<PostRow[]> {
 
   return data.map((row: Record<string, unknown>) => {
     const users = row.users as { full_name: string } | null;
-    const postChildren = (row.post_children as Array<{ child_id: string; children: { id: string; full_name: string } }> | null) ?? [];
+    const postChildren = (row.post_children as Array<{ child_id: string; children: { id: string; full_name: string } | null }> | null) ?? [];
     const photos = (row.post_photos as Array<{ id: string; url: string; width: number | null; height: number | null; position: number }> | null) ?? [];
 
     return {
@@ -80,10 +98,12 @@ export async function getFeedPosts(roomId: string | null): Promise<PostRow[]> {
       title: row.title as string | null,
       body: row.body as string,
       published_at: row.published_at as string,
-      children: postChildren.map((pc) => ({
-        id: pc.children.id,
-        full_name: pc.children.full_name,
-      })),
+      children: postChildren
+        .filter((pc) => pc.children != null)
+        .map((pc) => ({
+          id: pc.children!.id,
+          full_name: pc.children!.full_name,
+        })),
       photos: photos
         .sort((a, b) => a.position - b.position)
         .map((p) => ({

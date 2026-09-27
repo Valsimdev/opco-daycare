@@ -104,7 +104,22 @@ export function CreatePostModal({ open, onClose, kids: roomKids, roomId, roomNam
     const remaining = MAX_PHOTOS - photos.length;
     const toAdd = files.slice(0, remaining);
 
+    const oversized = toAdd.filter((f) => f.size > MAX_FILE_SIZE);
+    if (oversized.length > 0) {
+      const names = oversized.map((f) => f.name).join(", ");
+      setError(`Las imágenes "${names}" superan los 3 MB.`);
+    }
+
     const validFiles = toAdd.filter((f) => f.size <= MAX_FILE_SIZE);
+
+    if (validFiles.length === 0) {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setError(null);
 
     const newPhotos = validFiles.map((file) => ({
       file,
@@ -379,7 +394,7 @@ export function CreatePostModal({ open, onClose, kids: roomKids, roomId, roomNam
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   multiple
                   onChange={handleFileSelect}
                   className="hidden"
