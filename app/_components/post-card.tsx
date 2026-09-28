@@ -27,10 +27,14 @@ export interface PostCardData {
   time: string;
   children: PostChildData[];
   photos: PostPhotoData[];
+  roomName?: string;
+  reactions?: number;
+  comments?: number;
 }
 
 interface PostCardProps {
   post: PostCardData | Post;
+  roomName?: string;
 }
 
 const TYPE_LABEL_MAP: Record<string, string> = {
@@ -73,7 +77,7 @@ function normalizePost(post: PostCardData | Post): PostCardData | null {
   };
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, roomName }: PostCardProps) {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
@@ -119,6 +123,10 @@ export function PostCard({ post }: PostCardProps) {
     ? getRecipients(post.children)
     : post.recipients;
 
+  const reactionsCount = isPostCardData(post) ? post.reactions : post.reactions;
+  const commentsCount = isPostCardData(post) ? post.comments : post.comments;
+  const showStats = reactionsCount != null || commentsCount != null;
+
   return (
     <article className="rounded-[20px] border border-border bg-surface px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,0.5)]">
       <header className="mb-3.5 flex items-center gap-3">
@@ -148,7 +156,8 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex-1">
           <div className="font-display text-[16.5px] font-semibold text-ink-900">{data.title}</div>
           <div className="text-[12.5px] text-ink-400">
-            {data.time} · publicado por {data.author_name.split(" ")[0]}
+            {data.time} · {data.author_name.split(" ")[0]}
+            {roomName ? ` · ${roomName}` : ""}
           </div>
         </div>
         <TagBadge type={data.type} />
@@ -229,6 +238,28 @@ export function PostCard({ post }: PostCardProps) {
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Reactions and comments */}
+      {showStats && (
+        <div className="mt-4 flex items-center gap-[18px] border-t border-border-strong/30 pt-3.5">
+          {reactionsCount != null && reactionsCount > 0 && (
+            <span className="flex items-center gap-[7px] font-bold text-coral-600 text-[14px]">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" />
+              </svg>
+              {reactionsCount}
+            </span>
+          )}
+          {commentsCount != null && (
+            <span className="flex items-center gap-[7px] font-bold text-ink-400 text-[14px]">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
+              </svg>
+              {commentsCount}
+            </span>
+          )}
         </div>
       )}
     </article>
