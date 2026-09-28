@@ -3,11 +3,10 @@ schema: spec-driven
 # Project context (optional)
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  open-daycare: aplicación de gestión para una guardería. Permite administrar niños, publicaciones, avisos, resúmenes diarios, cuentas familiares y vinculación de padres. Stack: Next.js 16 (App Router), TypeScript strict, Tailwind CSS v4, Supabase (Postgres, Auth, Edge Functions). Toda la UI, specs y commits van en español.
+
+# Per-artifact rules (optional)
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
